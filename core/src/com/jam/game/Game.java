@@ -1,33 +1,51 @@
 package com.jam.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.jam.game.screens.GameScreen;
 
-public class Game extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
+public class Game implements ApplicationListener {
+	
+	private static GameScreen currentScreen;
+	private static GameScreen gameScreen;
+	
 	
 	@Override
 	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		gameScreen = new GameScreen();
+		currentScreen = gameScreen;
+		
+		currentScreen.show();
 	}
 
 	@Override
 	public void render () {
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+		
+		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
+		currentScreen.render(GdxAI.getTimepiece().getDeltaTime());
 	}
 	
 	@Override
 	public void dispose () {
-		batch.dispose();
-		img.dispose();
+		currentScreen.dispose();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		currentScreen.resize(width, height);
+	}
+
+	@Override
+	public void pause() {
+		currentScreen.pause();
+	}
+
+	@Override
+	public void resume() {
+		currentScreen.resume();
 	}
 }
