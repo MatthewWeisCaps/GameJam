@@ -2,11 +2,14 @@ package com.jam.game.screens;
 
 import java.awt.Rectangle;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.particles.values.RectangleSpawnShapeValue;
 import com.badlogic.gdx.graphics.g3d.utils.shapebuilders.BoxShapeBuilder;
 import com.badlogic.gdx.math.Vector2;
@@ -18,6 +21,9 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.jam.game.components.AnimationComponent;
+import com.jam.game.components.BodyComponent;
+import com.jam.game.systems.AnimationSystem;
 
 
 public class GameScreen implements Screen {
@@ -29,6 +35,10 @@ public class GameScreen implements Screen {
 	World b2dWorld;
 	Box2DDebugRenderer b2dRenderer;
 	OrthographicCamera camera;
+	
+	Engine engine = new Engine();
+	Entity playerEntity = new Entity();
+	
 	
 	Body player;
 	int speed = 50;
@@ -80,6 +90,14 @@ public class GameScreen implements Screen {
 		
 		setupInputHandler();
 		
+		//
+		engine.addSystem(new AnimationSystem(new SpriteBatch()));
+		
+		playerEntity.add(new AnimationComponent());
+		playerEntity.add(new BodyComponent(player));
+		
+		engine.addEntity(playerEntity);
+		
 	}
 
 	@Override
@@ -88,6 +106,7 @@ public class GameScreen implements Screen {
 		checkInput();
 		
 		b2dWorld.step(delta, 8, 3);
+		engine.update(delta);
 		
 		// render
 		b2dRenderer.render(b2dWorld, camera.combined);
