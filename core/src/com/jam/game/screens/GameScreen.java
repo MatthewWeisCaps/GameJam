@@ -33,7 +33,7 @@ import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
 import com.jam.game.systems.RenderingSystem;
 
-import Utils.PlayerAnims;
+import utils.PlayerAnims;
 import controllers.KeyboardController;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
@@ -124,14 +124,12 @@ public class GameScreen implements Screen {
 		Entity entity =  engine.createEntity();
 		BodyComponent body = engine.createComponent(BodyComponent.class);
 		TransformComponent pos = engine.createComponent(TransformComponent.class);
-//		TextureComponent tex = engine.createComponent(TextureComponent.class);
 		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
 		PlayerComponent player = engine.createComponent(PlayerComponent.class);
 		CollisionComponent col = engine.createComponent(CollisionComponent.class);
 		TypeComponent t = engine.createComponent(TypeComponent.class);
 		StateComponent st = engine.createComponent(StateComponent.class);
 		
-		//sorry bro
 		BodyDef playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyDef.BodyType.DynamicBody;
 		playerBodyDef.position.set(10, 10);
@@ -151,30 +149,13 @@ public class GameScreen implements Screen {
 		pos.pos.set(0,0,0);
 		t.type = TypeComponent.PLAYER;
 		st.set(StateComponent.STATE_NORMAL);
+				
+		setPlayerAnimations(anim);
 		
-		Texture playerTexture = new Texture("player_anim.png");
-//		TextureRegion playerRegion = new TextureRegion(playerTexture);		
-//		tex.region = playerRegion;
-		
-		
-		// anim setup
-		
-		Array<TextureRegion> regions = new Array<TextureRegion>(8);
-		regions.setSize(8);
-		for (int i=0; i < 8; i++) {
-			int y = 0;
-			int x = i*32;
-			regions.set(i, new TextureRegion(playerTexture, x, y, 32, 32));
-		}
-		System.out.println(regions.size);
-		AnimatedBox2DSprite rightWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(0.6f, regions, PlayMode.LOOP)));
-		anim.animations.put(PlayerAnims.WALK_RIGHT, rightWalk);
 		anim.currentAnimation = PlayerAnims.WALK_RIGHT;
-//		anim.animations.get(PlayerAnims.WALK_RIGHT).
 		
 		entity.add(body);
 		entity.add(pos);
-//		entity.add(tex);
 		entity.add(anim);
 		entity.add(player);
 		entity.add(col);
@@ -186,7 +167,72 @@ public class GameScreen implements Screen {
 		
 	}
 	
-	TextureRegion getRegion(Texture tex, int x, int y) {
+	void setPlayerAnimations(AnimationComponent anim) {
+		Texture playerTexture = new Texture("player_animation.png");
+		float aniSpeed = 0.6f;
+		
+		//Walk Right
+		Array<TextureRegion> regions = new Array<TextureRegion>(3);
+		regions.setSize(3);
+		
+		regions.set(0, getRegion(playerTexture, 6, 0, false));
+		regions.set(1, getRegion(playerTexture, 2, 0, false));
+		regions.set(2, getRegion(playerTexture, 7, 0, false));
+		regions.set(1, getRegion(playerTexture, 2, 0, false));
+		
+		AnimatedBox2DSprite rightWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		anim.animations.put(PlayerAnims.WALK_RIGHT, rightWalk);
+		
+		//Walk Left
+		regions = new Array<TextureRegion>(3);
+		regions.setSize(3);
+		
+		regions.set(0, getRegion(playerTexture, 6, 0, true));
+		regions.set(1, getRegion(playerTexture, 2, 0, true));
+		regions.set(2, getRegion(playerTexture, 7, 0, true));
+		regions.set(1, getRegion(playerTexture, 2, 0, true));
+		
+		AnimatedBox2DSprite leftWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		anim.animations.put(PlayerAnims.WALK_LEFT, leftWalk);
+		
+		//Idle Right
+		regions = new Array<TextureRegion>(2);
+		regions.setSize(2);
+		regions.set(0, getRegion(playerTexture, 2, 0, false));
+		regions.set(1, getRegion(playerTexture, 3, 0, false));
+		AnimatedBox2DSprite idleRight = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		anim.animations.put(PlayerAnims.IDLE_RIGHT, idleRight);
+		
+		//Idle Left
+		regions = new Array<TextureRegion>(2);
+		regions.setSize(2);
+		regions.set(0, getRegion(playerTexture, 2, 0, true));
+		regions.set(1, getRegion(playerTexture, 3, 0, true));
+		AnimatedBox2DSprite idleLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		anim.animations.put(PlayerAnims.IDLE_LEFT, idleLeft);
+		
+		//Jump Right
+		regions = new Array<TextureRegion>(2);
+		regions.setSize(2);
+		regions.set(0, getRegion(playerTexture, 8, 0, false));
+		regions.set(1, getRegion(playerTexture, 9, 0, false));
+		AnimatedBox2DSprite jumpRight = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
+		anim.animations.put(PlayerAnims.JUMP_RIGHT, jumpRight);
+		
+		//Jump Left
+		regions = new Array<TextureRegion>(2);
+		regions.setSize(2);
+		regions.set(0, getRegion(playerTexture, 8, 0, true));
+		regions.set(1, getRegion(playerTexture, 9, 0, true));
+		AnimatedBox2DSprite jumpLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
+		anim.animations.put(PlayerAnims.JUMP_LEFT, jumpLeft);
+
+	}
+	
+	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX) {
+		if (flipX) {
+			return new TextureRegion(tex, (x+1)*32, y*32, -32, 32);
+		}
 		return new TextureRegion(tex, x*32, y*32, 32, 32);
 	}
 	

@@ -16,7 +16,7 @@ import com.jam.game.components.BodyComponent;
 import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
 
-import Utils.Mappers;
+import utils.Mappers;
 
 public class RenderingSystem extends SortedIteratingSystem {
 

@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.TransformComponent;
 
-import Utils.Mappers;
+import utils.Mappers;
 
 public class PhysicsSystem extends IteratingSystem{
 	private static final float MAX_STEP_TIME = 1/60f;
