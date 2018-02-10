@@ -19,6 +19,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.b2d.Box2DContactListener;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.CollisionComponent;
@@ -41,16 +43,17 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class GameScreen implements Screen {
 	
-	public static final int VIRTUAL_WIDTH = 480/8;//480
-	public static final int VIRTUAL_HEIGHT = 320/8; //320
+	public static final int VIRTUAL_WIDTH = 240/8;//480
+	public static final int VIRTUAL_HEIGHT = 300/8; //320
 	public static final int UNIT = 2;
 	
 	World world;
 	PooledEngine engine;
 	Box2DDebugRenderer b2dRenderer;
-	private static OrthographicCamera camera;
+	private OrthographicCamera camera; // link to renderingsystem cam
 	KeyboardController controller;
 	SpriteBatch sb;
+	RenderingSystem renderingSystem;
 	
 	@Override
 	public void show() {
@@ -58,10 +61,10 @@ public class GameScreen implements Screen {
 		
 		sb = new SpriteBatch();
 		//Create our rendering system
-		RenderingSystem renderingSystem = new RenderingSystem(sb);
-		camera = RenderingSystem.getCamera();
+		renderingSystem = new RenderingSystem(sb);
+		camera = renderingSystem.getCamera();
 		sb.setProjectionMatrix(camera.combined);
-		
+				
 		engine = new PooledEngine();
 		
 		//Add all relevant systems
@@ -75,7 +78,9 @@ public class GameScreen implements Screen {
 		b2dRenderer = new Box2DDebugRenderer();
 		
 		createPlayer();
-		createFloor();		
+		createFloor();
+		
+		world.setContactListener(new Box2DContactListener());
 	}
 
 	@Override
@@ -95,7 +100,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		
+		renderingSystem.getViewport().update(width, height, true);
 	}
 
 	@Override
@@ -132,7 +137,7 @@ public class GameScreen implements Screen {
 		
 		BodyDef playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyDef.BodyType.DynamicBody;
-		playerBodyDef.position.set(10, 10);
+		playerBodyDef.position.set(VIRTUAL_WIDTH/2.0f, 4.0f);
 		
 		body.b2dBody = world.createBody(playerBodyDef);
 		FixtureDef playerFixture = new FixtureDef();
@@ -143,6 +148,7 @@ public class GameScreen implements Screen {
 		
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
+		playerFixture.friction = 1.0f;
 		
 		body.b2dBody.createFixture(playerFixture);
 		
@@ -242,7 +248,7 @@ public class GameScreen implements Screen {
 		
 		BodyDef floorBodyDef = new BodyDef();
 		floorBodyDef.type = BodyDef.BodyType.StaticBody;
-		floorBodyDef.position.set(0,0);
+		floorBodyDef.position.set(VIRTUAL_WIDTH/2.0f,0);
 		
 		body.b2dBody = world.createBody(floorBodyDef);
 		
