@@ -13,7 +13,7 @@ import controllers.KeyboardController;
 import utils.Mappers;
 import utils.PlayerAnims;
 
-public class PlayerControlSystem extends IteratingSystem{
+public class PlayerControlSystem extends IteratingSystem {
 	KeyboardController controller;
 	int lastXDir = 1;
 	

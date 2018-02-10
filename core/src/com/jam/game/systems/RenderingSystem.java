@@ -11,10 +11,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
+import com.jam.game.screens.GameScreen;
 
 import utils.Mappers;
 
@@ -49,7 +51,8 @@ public class RenderingSystem extends SortedIteratingSystem {
     private SpriteBatch batch;
     private Array<Entity> renderQueue;
     private Comparator<Entity> comparator;
-    private static OrthographicCamera cam;
+    private OrthographicCamera cam;
+    private FitViewport viewport;
     
     private ComponentMapper<TextureComponent> textureM;
     private ComponentMapper<TransformComponent> transformM;
@@ -71,6 +74,7 @@ public class RenderingSystem extends SortedIteratingSystem {
         // set up the camera to match our screen size
         cam = new OrthographicCamera(FRUSTUM_WIDTH, FRUSTUM_HEIGHT);
         cam.position.set(FRUSTUM_WIDTH / 2f, FRUSTUM_HEIGHT / 2f, 0);
+        viewport = new FitViewport(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT, cam);
     }
 
     @Override
@@ -120,8 +124,12 @@ public class RenderingSystem extends SortedIteratingSystem {
 		renderQueue.add(entity);
 	}
 	
-	public static OrthographicCamera getCamera() {
+	public OrthographicCamera getCamera() {
 		return cam;
+	}
+	
+	public FitViewport getViewport() {
+		return viewport;
 	}
 
 }
