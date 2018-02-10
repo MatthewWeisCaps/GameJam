@@ -16,7 +16,6 @@ public class Game implements ApplicationListener {
 	public void create () {
 		gameScreen = new GameScreen();
 		currentScreen = gameScreen;
-		
 		currentScreen.show();
 	}
 

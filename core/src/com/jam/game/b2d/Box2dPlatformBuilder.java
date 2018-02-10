@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
+import com.jam.game.levels.Platform;
 
 /*
  * Builder for platforms.
@@ -129,7 +130,10 @@ public class Box2dPlatformBuilder implements Disposable {
 	}
 	
 	public static Box2dPlatformBuilder DEFAULT() {
-		
+		return Box2dPlatformBuilder.DEFAULT(1.5f, 0.5f);
+	}
+	
+	public static Box2dPlatformBuilder DEFAULT(float width, float height) {
 		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
 		
 		builder.setBodyType(BodyType.StaticBody);
@@ -139,9 +143,15 @@ public class Box2dPlatformBuilder implements Disposable {
 		builder.setRestitution(0.9f);
 		
 		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(1.5f, 0.5f);
+		shape.setAsBox(width, height);
 		builder.setShape(shape);
+		
+		return builder;
+	}
 	
+	public static Box2dPlatformBuilder DEFAULT(Platform platform) {
+		Box2dPlatformBuilder builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+		builder.setBodyPosition(platform.x, platform.y); 	
 		return builder;
 	}
 
