@@ -9,8 +9,6 @@ public class PlayerAnims {
 	
 	public static String IDLE_LEFT = "idleLeft";
 	public static String IDLE_RIGHT = "idleRight";
-
-
 	
 	public static String JUMP_LEFT = "jumpLeft";
 	public static String JUMP_RIGHT = "jumpRight";
