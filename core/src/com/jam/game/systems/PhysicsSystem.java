@@ -31,19 +31,20 @@ public class PhysicsSystem extends IteratingSystem{
     	float frameTime = Math.min(deltaTime, 0.25f);
     	accumulator += frameTime;
     	
-    	if(accumulator >= MAX_STEP_TIME) {
-    		world.step(MAX_STEP_TIME, 6, 2);
+    	while(accumulator >= MAX_STEP_TIME) {
+    		world.step(MAX_STEP_TIME, 8, 3);
     		accumulator -= MAX_STEP_TIME;
-    		
-    		//entity queue
-    		for(Entity entity : bodiesQueue) {
-    			TransformComponent tfm = Mappers.transformMap.get(entity);
-    			BodyComponent bodyComp = Mappers.bodyMap.get(entity);
-    			Vector2 pos = bodyComp.b2dBody.getPosition();
-    			tfm.pos.x = pos.x;
-    			tfm.pos.y = pos.y;
-    		}
     	}
+    	
+    	//entity queue
+		for(Entity entity : bodiesQueue) {
+			TransformComponent tfm = Mappers.transformMap.get(entity);
+			BodyComponent bodyComp = Mappers.bodyMap.get(entity);
+			Vector2 pos = bodyComp.b2dBody.getPosition();
+			tfm.pos.x = pos.x;
+			tfm.pos.y = pos.y;
+		}
+    	
     	bodiesQueue.clear();
     }
     

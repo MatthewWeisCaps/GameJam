@@ -17,8 +17,13 @@ public class Box2DContactListener implements ContactListener {
 		
 		if(ret) return;
 		
-		Entity e1 = (Entity) contact.getFixtureA().getUserData();
-		Entity e2 = (Entity) contact.getFixtureA().getUserData();
+		/*
+		 * Body holds Entity
+		 * Fixture holds ___
+		 */
+		
+		Entity e1 = (Entity) contact.getFixtureA().getBody().getUserData();
+		Entity e2 = (Entity) contact.getFixtureB().getBody().getUserData();
 		
 		
 		

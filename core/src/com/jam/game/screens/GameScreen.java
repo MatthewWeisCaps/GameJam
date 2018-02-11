@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.b2d.Box2DContactListener;
 import com.jam.game.components.AnimationComponent;
@@ -29,12 +30,15 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.components.TypeComponent;
+import com.jam.game.levels.Level;
 import com.jam.game.systems.AnimationSystem;
 import com.jam.game.systems.CollisionSystem;
+import com.jam.game.systems.LevelSystem;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
 import com.jam.game.systems.RenderingSystem;
 
+import utils.Mappers;
 import utils.PlayerAnims;
 import controllers.KeyboardController;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
@@ -56,6 +60,7 @@ public class GameScreen implements Screen {
 	KeyboardController controller;
 	SpriteBatch sb;
 	RenderingSystem renderingSystem;
+	Entity player;
 	
 	@Override
 	public void show() {
@@ -73,16 +78,19 @@ public class GameScreen implements Screen {
 		engine.addSystem(renderingSystem);
 		engine.addSystem(new PhysicsSystem(world));
 		engine.addSystem(new CollisionSystem());
-		
+				
 		controller = new KeyboardController();
 		engine.addSystem(new PlayerControlSystem(controller));
 		
+		
 		b2dRenderer = new Box2DDebugRenderer();
 		
-		createPlayer();
+		player = createPlayer();
 		createFloor();
-		
+
 		world.setContactListener(new Box2DContactListener());
+		
+		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 	}
 
 	@Override
@@ -127,7 +135,7 @@ public class GameScreen implements Screen {
 		sb.dispose();
 	}
 	
-	void createPlayer() {
+	Entity createPlayer() {
 		Entity entity =  engine.createEntity();
 		BodyComponent body = engine.createComponent(BodyComponent.class);
 		TransformComponent pos = engine.createComponent(TransformComponent.class);
@@ -145,7 +153,7 @@ public class GameScreen implements Screen {
 		FixtureDef playerFixture = new FixtureDef();
 		
 		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(UNIT/2, UNIT/2);
+		boxShape.setAsBox(UNIT/2.0f, UNIT);
 		
 		
 		playerFixture.shape = boxShape;
@@ -173,6 +181,7 @@ public class GameScreen implements Screen {
 		engine.addEntity(entity);
 		boxShape.dispose();
 		
+		return entity;
 	}
 	
 	void setPlayerAnimations(AnimationComponent anim) {
@@ -245,11 +254,20 @@ public class GameScreen implements Screen {
 		regions.set(1, getRegion(TEXTURE, 1, 1, true));
 		AnimatedBox2DSprite jumpLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
 		anim.animations.put(PlayerAnims.JUMP_LEFT, jumpLeft);
+		
+		for (Entry<String, AnimatedBox2DSprite> se : anim.animations.entries()) {
+			AnimatedBox2DSprite s = se.value;
+			s.setAdjustHeight(false);
+			s.setAdjustWidth(false);
+			s.setUseOrigin(false);
+			s.setScale(0.15f);
+			s.setPosition(-UNIT/0.95f, -UNIT/1.25f);
+		}
 	}
 	
 	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX) {
 		if (flipX) {
-			return new TextureRegion(tex, (x+1)*32, y*32, -32, 32);
+			return new TextureRegion(tex, (x+1)*32 - 2, y*32, -32, 32);
 		}
 		return new TextureRegion(tex, x*32, y*32, 32, 32);
 	}
