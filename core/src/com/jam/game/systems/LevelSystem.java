@@ -37,7 +37,7 @@ public class LevelSystem extends EntitySystem {
 	RayHandler lightRayHandler;
 	
 	private float camSpeed = 1.60f;
-	private float camSpeedMax = 3.2f;
+	private float camSpeedMax = 2.75f;
 //	private final static float INTERVAL = 1.0f/15.0f;
 	private Level level;
 	private OrthographicCamera cam;

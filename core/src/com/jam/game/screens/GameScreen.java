@@ -157,9 +157,9 @@ public class GameScreen implements Screen {
 		}
 
 		SpriteBatch sb = engine.getSystem(RenderingSystem.class).getBatch();
-		sb.begin();
-		font.draw(sb, "move = wsad\nthrow rope = q\nrelease rope = e\nstand still for light", 5, 3);
-		sb.end();
+		//sb.begin();
+		//font.draw(sb, "move = wsad\nthrow rope = q\nrelease rope = e\nstand still for light", 5, 3);
+		//sb.end();
 
 		//if(Gdx.input.isKeyJustPressed(Keys.V)) playDeathSound();
 		

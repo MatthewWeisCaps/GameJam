@@ -25,7 +25,7 @@ public class StartScreen implements Screen{
 	public final static int VIRTUAL_WIDTHSS = 32;
 	public final static int VIRTUAL_HEIGHTSS = 32;
 	
-	private Music music;
+	private Music music = music = Gdx.audio.newMusic(Gdx.files.internal("title_music_cut.mp3"));
 	
 	OrthographicCamera camera;
     FitViewport viewport;
@@ -47,7 +47,7 @@ public class StartScreen implements Screen{
 		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
 		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
 		
-		music = Gdx.audio.newMusic(Gdx.files.internal("title_music_cut.mp3"));
+//		music = Gdx.audio.newMusic(Gdx.files.internal("title_music_cut.mp3"));
 		music.play();
 		music.setLooping(true);
 		

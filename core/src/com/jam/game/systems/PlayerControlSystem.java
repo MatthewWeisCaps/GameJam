@@ -35,8 +35,10 @@ public class PlayerControlSystem extends IteratingSystem {
 	
 	int speed = 10;
 	
-	float distSubValue = -0.1f;
+	float distSubValue = -0.05f;
 	float distAddValue = 0.40f;
+	
+	boolean qHit = false;
 	
 	public static final float MAX_ROPE_LENGTH = 13.0f;
 	public static final float ROPE_CAST_TIME = 0.30f;
@@ -84,6 +86,8 @@ public class PlayerControlSystem extends IteratingSystem {
 					state.beginThrowingRopeTime = 0.0f;
 					state.ropeJoint = (RopeJoint) world.createJoint(state.ropeJointDef);
 					state.isSwinging = true;
+					qHit = true;
+					
 				} else {
 					// fail to connect
 					state.isThrowingRope = false;
@@ -114,7 +118,7 @@ public class PlayerControlSystem extends IteratingSystem {
 			if(len <= MIN_ROPE_LENGTH) len = MIN_ROPE_LENGTH;
 			
 			state.ropeJoint.setMaxLength(len);
-			if (Gdx.input.isKeyJustPressed(Keys.E)) { // cancel rope, but not isSwinging. isSwinging turns off upon landing, see contact listener
+			if (Gdx.input.isKeyJustPressed(Keys.SPACE)) { // cancel rope, but not isSwinging. isSwinging turns off upon landing, see contact listener
 				
 				System.out.println("end 1 (handled by playerController)");
 				this.getEngine().getSystem(PhysicsSystem.class).safelyMarkJointForDestruction(state);
@@ -226,7 +230,7 @@ public class PlayerControlSystem extends IteratingSystem {
 		
 		// INDIANA JONES STYLE
 		
-		if (Gdx.input.isKeyJustPressed(Keys.Q)) { // rope
+		if (Gdx.input.isKeyJustPressed(Keys.SPACE)) { // rope
 			
 			FitViewport viewport = this.getEngine().getSystem(RenderingSystem.class).getViewport();
 			Camera cam = viewport.getCamera();
