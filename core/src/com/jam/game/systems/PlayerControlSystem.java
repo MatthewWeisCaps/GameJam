@@ -35,11 +35,14 @@ public class PlayerControlSystem extends IteratingSystem {
 	
 	int speed = 10;
 	
-	float distSubValue = -0.05f;
-	float distAddValue = 0.50f;
+	float distSubValue = -0.1f;
+	float distAddValue = 0.40f;
 	
-	public static final float MAX_ROPE_LENGTH = 10.0f;
-	public static final float ROPE_CAST_TIME = 0.80f;
+	public static final float MAX_ROPE_LENGTH = 13.0f;
+	public static final float ROPE_CAST_TIME = 0.30f;
+	
+	public float MIN_ROPE_LENGTH = 3.0f;
+	public float ROPE_PULL_UP_SPEED = .15f;
 	
 	private final float swingForce = 30.0f;
 	private final Vector2 swingForce_left = new Vector2(-swingForce, 0.0f);
@@ -107,6 +110,10 @@ public class PlayerControlSystem extends IteratingSystem {
 			
 			body.b2dBody.setGravityScale(5.0f);
 			
+			float len = state.ropeJoint.getMaxLength() - ROPE_PULL_UP_SPEED;
+			if(len <= MIN_ROPE_LENGTH) len = MIN_ROPE_LENGTH;
+			
+			state.ropeJoint.setMaxLength(len);
 			if (Gdx.input.isKeyJustPressed(Keys.E)) { // cancel rope, but not isSwinging. isSwinging turns off upon landing, see contact listener
 				
 				System.out.println("end 1 (handled by playerController)");
@@ -130,7 +137,6 @@ public class PlayerControlSystem extends IteratingSystem {
 			
 			return;
 		} else if (state.isSwinging && state.ropeJoint == null) { // released rope, yet to touch ground...
-			
 			body.b2dBody.setGravityScale(2.0f);
 			
 			if (Math.abs(body.b2dBody.getLinearVelocity().y) <= 0.0000000000005f) {

@@ -4,23 +4,28 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.Game;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class DeathScreen implements Screen{
 	public final static int VIRTUAL_WIDTH = 32;
 	public final static int VIRTUAL_HEIGHT = 32;
-	
+
 	private Music music;
+	
+	public static boolean playAgain = false;
 	
 	OrthographicCamera camera;
     FitViewport viewport;
@@ -30,13 +35,23 @@ public class DeathScreen implements Screen{
     
     Random r = new Random();
     
+    private Game game;
+    public DeathScreen(Game game) {
+    	this.game = game;
+    }
+    
 	@Override
 	public void show() {
+		int old_Width = Gdx.graphics.getWidth();
+		int old_Height = Gdx.graphics.getHeight();
+		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
+		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
+		
 		float songNum = r.nextFloat();
 		
-		music = songNum > .5 ? Gdx.audio.newMusic(Gdx.files.internal("death_music_1.mp3")) : Gdx.audio.newMusic(Gdx.files.internal("death_music_2.mp3"));
+		music = Gdx.audio.newMusic(Gdx.files.internal("death_music_2_cut.mp3"));
 		music.play();
-		music.setLooping(true);
+		music.setLooping(false);
 		
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
@@ -56,6 +71,13 @@ public class DeathScreen implements Screen{
 		sprite.draw(batch);
 		
 		batch.end();
+		
+		if(Gdx.input.isKeyJustPressed(Keys.ANY_KEY)) {
+			music.pause();
+			music.dispose();
+			playAgain = true; 
+			Gdx.app.exit();
+		}
 	}
 	
 	public Animation<TextureRegion> getAnimationRegions() {

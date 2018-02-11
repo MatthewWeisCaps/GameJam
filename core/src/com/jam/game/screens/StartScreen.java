@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.Game;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
@@ -21,8 +22,8 @@ import utils.PlayerAnims;
 
 public class StartScreen implements Screen{
 	
-	public final static int VIRTUAL_WIDTH = 32;
-	public final static int VIRTUAL_HEIGHT = 32;
+	public final static int VIRTUAL_WIDTHSS = 32;
+	public final static int VIRTUAL_HEIGHTSS = 32;
 	
 	private Music music;
 	
@@ -33,14 +34,25 @@ public class StartScreen implements Screen{
     ArrayList<Animation<TextureRegion>> animationRegions;
     
     int onScreen = 0;
+    private Game game;
+    
+    public StartScreen(Game game) {
+    	this.game = game;
+    }
+    
 	@Override
 	public void show() {
-		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
+		int old_Width = Gdx.graphics.getWidth();
+		int old_Height = Gdx.graphics.getHeight();
+		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
+		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
+		
+		music = Gdx.audio.newMusic(Gdx.files.internal("title_music_cut.mp3"));
 		music.play();
 		music.setLooping(true);
 		
-		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
+		camera = new OrthographicCamera(VIRTUAL_WIDTHSS, VIRTUAL_HEIGHTSS);
+		viewport = new FitViewport(VIRTUAL_WIDTHSS, VIRTUAL_HEIGHTSS, camera);
 		batch = new SpriteBatch();
 		
 		animationRegions = getAnimationRegions();

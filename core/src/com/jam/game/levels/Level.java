@@ -118,7 +118,7 @@ public class Level {
 				float xPos, width;
 				
 //				if (random.nextBoolean()) {
-					xPos = randomFloatInRange(0, (GameScreen.VIRTUAL_WIDTH/2.0f));
+					xPos = randomFloatInRange(5, (GameScreen.VIRTUAL_WIDTH/2.5f));
 					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
 //				} else {
 //					xPos = randomFloatInRange(MAX_WIDTH, GameScreen.VIRTUAL_WIDTH/2.0f);

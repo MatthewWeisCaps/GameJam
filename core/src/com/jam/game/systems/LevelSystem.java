@@ -36,6 +36,8 @@ public class LevelSystem extends EntitySystem {
 	private static final TextureRegion PLATFORM_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
 	RayHandler lightRayHandler;
 	
+	private float camSpeed = 1.60f;
+	private float camSpeedMax = 3.2f;
 //	private final static float INTERVAL = 1.0f/15.0f;
 	private Level level;
 	private OrthographicCamera cam;
@@ -80,7 +82,10 @@ public class LevelSystem extends EntitySystem {
 			Camera cam = viewport.getCamera();
 			cam.update();
 			Vector3 coords3D = cam.project(new Vector3(platform.getBody().getPosition(), 0.0f), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+			
 //			Vector2 coords = new Vector2(coords3D.x, coords3D.y);
+			
+
 			
 			if (coords3D.y < -5.0f) {
 				
@@ -92,7 +97,6 @@ public class LevelSystem extends EntitySystem {
 				
 				level.getAndRemoveTail(); // removes body from world, and platform from level queue
 				
-				System.out.println("removed platform.");
 			}
 		}
 		
@@ -129,7 +133,6 @@ public class LevelSystem extends EntitySystem {
 				
 				engine.addEntity(entity);
 				
-				System.out.println("spawned platform.");
 			}
 			
 ////			bodyC.b2dBody = level.spawnNext((PooledEngine) this.getEngine()); // populate components
@@ -166,7 +169,11 @@ public class LevelSystem extends EntitySystem {
 	
 	// test 1
 	private float calculateYHeight() {
-		return 1.60f * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
+		camSpeed += 0.001f;
+		
+		if(camSpeed > camSpeedMax) camSpeed = camSpeedMax;
+		
+		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
 	}
 	
 	private float randomFloatInRange(float start, float end) {

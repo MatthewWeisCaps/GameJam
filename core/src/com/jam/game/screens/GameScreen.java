@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -23,7 +25,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.Game;
 import com.jam.game.b2d.Box2DContactListener;
+import com.jam.game.b2d.Box2dPlatformBuilder;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.CollisionComponent;
@@ -52,13 +56,19 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class GameScreen implements Screen {
 	
+	private Game game;
 	public static boolean doneLoading = false;
+	public static boolean finishedDeathStuff = false;
 	
 	public static final int VIRTUAL_WIDTH = 480/10;//380/8;//480
 	public static final int VIRTUAL_HEIGHT = 800/10;//300/8; //320
 	public static final int UNIT = 2;
 	
+	public boolean playerDeath = false;
+	
 	public final static Texture TEXTURE = new Texture("full_sheet.png");
+	
+	static Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("gameplay_music.mp3"));
 	
 	World world;
 	PooledEngine engine;
@@ -69,16 +79,30 @@ public class GameScreen implements Screen {
 	RenderingSystem renderingSystem;
 	Entity player;
 	
+	public GameScreen(Game game) {
+		this.game = game;
+	}
 	
 	@Override
 	public void show() {
+		playerDeath = false;
+		finishedDeathStuff = false;
+		gameMusic.play();
+		gameMusic.setLooping(true);
+		
+		//Gross hack 
+		int old_Width = Gdx.graphics.getWidth();
+		int old_Height = Gdx.graphics.getHeight();
+		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
+		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
+		
 		world = new World(new Vector2(0, -20f), true);
 		
 		sb = new SpriteBatch();
 		//Create our rendering system
 		renderingSystem = new RenderingSystem(sb);
 		camera = renderingSystem.getCamera();
-		sb.setProjectionMatrix(camera.combined);
+//		sb.setProjectionMatrix(camera.combined);
 				
 		engine = new PooledEngine();
 		
@@ -112,17 +136,32 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void render(float delta) {
-
+		if(!doneLoading) { 
+			resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			System.out.println("RETURNING NOT DONE YET");
+			return;
+		}
 		// logic
 		
 		//world.step(delta, 8, 3);
 		
 		engine.update(delta);
 		
+		if(!playerDeath && doneLoading) {
+			Vector3 player3D = camera.project(new Vector3(Mappers.bodyMap.get(player).b2dBody.getPosition(), 0.0f), renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(), renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
+			
+			if(player3D.y < -32.0f) {
+				playerDeath = true;
+				death();
+			}
+		}
+
 		SpriteBatch sb = engine.getSystem(RenderingSystem.class).getBatch();
 		sb.begin();
 		font.draw(sb, "move = wsad\nthrow rope = q\nrelease rope = e\nstand still for light", 5, 3);
 		sb.end();
+
+		//if(Gdx.input.isKeyJustPressed(Keys.V)) playDeathSound();
 		
 		// render
 //		b2dRenderer.render(world, camera.combined);
@@ -135,7 +174,7 @@ public class GameScreen implements Screen {
 //			.draw(engine.getSystem(RenderingSystem.class).getBatch(), Mappers.bodyMap.get(player).b2dBody);
 //		engine.getSystem(RenderingSystem.class).getBatch().end();
 //		
-		Gdx.graphics.setTitle(Integer.toString(Gdx.graphics.getFramesPerSecond()));
+		Gdx.graphics.setTitle("Lantern");
 		//camera.lookAt(100.0f, 100.0f, 0.0f);
 //		camera.position.set(new Vector3(100.0f, 100.0f, 0.0f));
 	}
@@ -148,7 +187,24 @@ public class GameScreen implements Screen {
 				renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
 	}
 
+	
+	public void death() {
+		Music deathSound =  Gdx.audio.newMusic(Gdx.files.internal("death_effect_cut.mp3"));
+		deathSound.play();
+		
+		gameMusic.setVolume(gameMusic.getVolume()/4);
+		
+		deathSound.setOnCompletionListener(new Music.OnCompletionListener() {
+		    @Override
+		    public void onCompletion(Music aMusic) {  
+		        finishedDeathStuff = true;
+		    }
+		});		
+	}
 
+	public void listener() {
+		
+	}
 	@Override
 	public void pause() {
 		
@@ -169,6 +225,8 @@ public class GameScreen implements Screen {
 		world.dispose();
 		b2dRenderer.dispose();
 		sb.dispose();
+		gameMusic.dispose();
+		engine.removeAllEntities();
 	}
 	
 	Entity createPlayer() {
@@ -224,7 +282,7 @@ public class GameScreen implements Screen {
 	}
 	
 	void setPlayerAnimations(AnimationComponent anim) {
-		float aniSpeed = 0.6f;
+		float aniSpeed = 0.2f;
 		
 		//Walk Right
 		Array<TextureRegion> regions = new Array<TextureRegion>(3);
@@ -293,7 +351,7 @@ public class GameScreen implements Screen {
 		regions.set(1, getRegion(TEXTURE, 1, 1, true));
 		AnimatedBox2DSprite jumpLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
 		anim.animations.put(PlayerAnims.JUMP_LEFT, jumpLeft);
-		
+				
 		for (Entry<String, AnimatedBox2DSprite> se : anim.animations.entries()) {
 			AnimatedBox2DSprite s = se.value;
 //			s.setAdjustHeight(false);
@@ -322,9 +380,15 @@ public class GameScreen implements Screen {
 	}
 	
 	void createFloor() { //https://www.gamedevelopment.blog/full-libgdx-game-tutorial-entities-ashley/
+		TextureRegion FLOOR_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
+		TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 32, 7);
+		
 		Entity entity = engine.createEntity();
 		BodyComponent body = engine.createComponent(BodyComponent.class);
-		
+		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
+		TransformComponent pos = engine.createComponent(TransformComponent.class);
+
+
 		BodyDef floorBodyDef = new BodyDef();
 		floorBodyDef.type = BodyDef.BodyType.StaticBody;
 		floorBodyDef.position.set(VIRTUAL_WIDTH/2.0f,0);
@@ -334,7 +398,7 @@ public class GameScreen implements Screen {
 		FixtureDef floorFixture = new FixtureDef();
 		
 		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(VIRTUAL_WIDTH/2, UNIT/2);
+		boxShape.setAsBox(VIRTUAL_WIDTH/2, UNIT);
 		
 		floorFixture.shape = boxShape;
 		floorFixture.restitution = 0.0f;
@@ -342,15 +406,126 @@ public class GameScreen implements Screen {
 		
 		body.b2dBody.createFixture(floorFixture);
 		
-		TypeComponent type = engine.createComponent(TypeComponent.class);
-		type.type = TypeComponent.WALL;
+		pos.pos.set(0,32,0);
 		
+		
+		Array<TextureRegion> one = new Array<TextureRegion>();
+		one.setSize(1);
+		one.set(0, FLOOR_TEXTURE);
+		
+		one.add(FLOOR_TEXTURE);
+		
+		final String def = "DEFAULT";
+		anim.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+		anim.currentAnimation = def;
+		
+		entity.add(anim);
 		entity.add(body);
-		entity.add(type);
+		entity.add(pos);
 		
 		engine.addEntity(entity);
+		boxShape.dispose();
 		
-				
+		createLeftWall();
+		createRightWall();
+	}
+	
+	void createLeftWall() {
+		TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 6, 32);
+		
+		Entity entity = engine.createEntity();
+		BodyComponent body = engine.createComponent(BodyComponent.class);
+		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
+		TransformComponent pos = engine.createComponent(TransformComponent.class);
+
+
+		BodyDef floorBodyDef = new BodyDef();
+		floorBodyDef.type = BodyDef.BodyType.StaticBody;
+		floorBodyDef.position.set(0,VIRTUAL_HEIGHT*2);
+		
+		body.b2dBody = world.createBody(floorBodyDef);
+		
+		FixtureDef floorFixture = new FixtureDef();
+		
+		PolygonShape boxShape = new PolygonShape();
+		boxShape.setAsBox(UNIT, VIRTUAL_HEIGHT*2);
+		
+		floorFixture.shape = boxShape;
+		floorFixture.restitution = 0.0f;
+		floorFixture.friction = 0.0f;
+		
+		body.b2dBody.createFixture(floorFixture);
+		
+		pos.pos.set(128,32,0);
+		
+		
+		Array<TextureRegion> one = new Array<TextureRegion>();
+		one.setSize(1);
+		one.set(0, WALL_TEXTURE);
+		
+		one.add(WALL_TEXTURE);
+		
+		final String def = "DEFAULT";
+		anim.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+		anim.currentAnimation = def;
+		
+		entity.add(anim);
+		entity.add(body);
+		entity.add(pos);
+		
+		engine.addEntity(entity);
+		boxShape.dispose();
+	}
+	
+	void createRightWall() {
+		TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 6, 32);
+		//WALL_TEXTURE.flip(true, false);
+		
+		Entity entity = engine.createEntity();
+		BodyComponent body = engine.createComponent(BodyComponent.class);
+		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
+		TransformComponent pos = engine.createComponent(TransformComponent.class);
+
+
+		BodyDef floorBodyDef = new BodyDef();
+		floorBodyDef.type = BodyDef.BodyType.StaticBody;
+		floorBodyDef.position.set(VIRTUAL_WIDTH,VIRTUAL_HEIGHT*2);
+		
+		body.b2dBody = world.createBody(floorBodyDef);
+		
+		FixtureDef floorFixture = new FixtureDef();
+		
+		PolygonShape boxShape = new PolygonShape();
+		boxShape.setAsBox(UNIT, VIRTUAL_HEIGHT*2);
+		
+		floorFixture.shape = boxShape;
+		floorFixture.restitution = 0.0f;
+		floorFixture.friction = 0.0f;
+		
+		body.b2dBody.createFixture(floorFixture);
+		
+		pos.pos.set(128,32,0);
+		
+		
+		Array<TextureRegion> one = new Array<TextureRegion>();
+		one.setSize(1);
+		one.set(0, WALL_TEXTURE);
+		
+		one.add(WALL_TEXTURE);
+		
+		final String def = "DEFAULT";
+		anim.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+		anim.currentAnimation = def;
+		
+		entity.add(anim);
+		entity.add(body);
+		entity.add(pos);
+		
+		engine.addEntity(entity);
+		boxShape.dispose();
 	}
 
 }
