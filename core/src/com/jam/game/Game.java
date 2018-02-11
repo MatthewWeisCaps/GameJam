@@ -27,7 +27,7 @@ public class Game implements ApplicationListener {
 		gameScreen = new GameScreen();
 		deathScreen = new DeathScreen();
 		
-		currentScreen = gameScreen;
+		currentScreen = startScreen;
 				
 		currentScreen.show();
 	}
@@ -37,8 +37,12 @@ public class Game implements ApplicationListener {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
-		currentScreen.render(GdxAI.getTimepiece().getDeltaTime());
+		if (currentScreen == gameScreen) {
+			GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
+			currentScreen.render(GdxAI.getTimepiece().getDeltaTime());
+		} else {
+			currentScreen.render(Gdx.graphics.getDeltaTime());
+		}
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
 			Gdx.app.exit();
