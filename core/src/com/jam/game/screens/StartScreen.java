@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,6 +24,8 @@ public class StartScreen implements Screen{
 	public final static int VIRTUAL_WIDTH = 32;
 	public final static int VIRTUAL_HEIGHT = 32;
 	
+	private Music music;
+	
 	OrthographicCamera camera;
     FitViewport viewport;
     SpriteBatch batch;
@@ -32,6 +35,10 @@ public class StartScreen implements Screen{
     int onScreen = 0;
 	@Override
 	public void show() {
+		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
+		music.play();
+		music.setLooping(true);
+		
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 		batch = new SpriteBatch();
@@ -64,7 +71,12 @@ public class StartScreen implements Screen{
 	}
 	
 	public boolean canStartGame() {
-		return onScreen >= 2 && sprite.isAnimationFinished();
+		if(onScreen >= 2 && sprite.isAnimationFinished()) {
+			music.pause();
+			//TODO Play start sound here
+			return true;
+		}
+		return false;
 	}
 	
 	public ArrayList<Animation<TextureRegion>> getAnimationRegions() {
@@ -126,6 +138,7 @@ public class StartScreen implements Screen{
 	@Override
 	public void dispose() {
 		batch.dispose();
+		music.dispose();
 	}
 
 }
