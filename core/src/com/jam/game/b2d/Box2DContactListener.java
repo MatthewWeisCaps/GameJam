@@ -12,8 +12,15 @@ public class Box2DContactListener implements ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
+		
+		boolean ret = true;
+		
+		if(ret) return;
+		
 		Entity e1 = (Entity) contact.getFixtureA().getUserData();
 		Entity e2 = (Entity) contact.getFixtureA().getUserData();
+		
+		
 		
 		if (Mappers.playerMap.has(e1)) {
 			

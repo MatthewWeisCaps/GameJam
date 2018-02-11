@@ -47,6 +47,8 @@ public class GameScreen implements Screen {
 	public static final int VIRTUAL_HEIGHT = 300/8; //320
 	public static final int UNIT = 2;
 	
+	public final static Texture TEXTURE = new Texture("full_sheet.png");
+	
 	World world;
 	PooledEngine engine;
 	Box2DDebugRenderer b2dRenderer;
@@ -174,17 +176,16 @@ public class GameScreen implements Screen {
 	}
 	
 	void setPlayerAnimations(AnimationComponent anim) {
-		Texture playerTexture = new Texture("player_animation.png");
 		float aniSpeed = 0.6f;
 		
 		//Walk Right
 		Array<TextureRegion> regions = new Array<TextureRegion>(3);
 		regions.setSize(3);
 		
-		regions.set(0, getRegion(playerTexture, 6, 0, false));
-		regions.set(1, getRegion(playerTexture, 2, 0, false));
-		regions.set(2, getRegion(playerTexture, 7, 0, false));
-		regions.set(1, getRegion(playerTexture, 2, 0, false));
+		regions.set(0, getRegion(TEXTURE, 6, 0, false));
+		regions.set(1, getRegion(TEXTURE, 2, 0, false));
+		regions.set(2, getRegion(TEXTURE, 7, 0, false));
+		regions.set(1, getRegion(TEXTURE, 2, 0, false));
 		
 		AnimatedBox2DSprite rightWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
 		anim.animations.put(PlayerAnims.WALK_RIGHT, rightWalk);
@@ -193,46 +194,57 @@ public class GameScreen implements Screen {
 		regions = new Array<TextureRegion>(3);
 		regions.setSize(3);
 		
-		regions.set(0, getRegion(playerTexture, 6, 0, true));
-		regions.set(1, getRegion(playerTexture, 2, 0, true));
-		regions.set(2, getRegion(playerTexture, 7, 0, true));
-		regions.set(1, getRegion(playerTexture, 2, 0, true));
+		regions.set(0, getRegion(TEXTURE, 6, 0, true));
+		regions.set(1, getRegion(TEXTURE, 2, 0, true));
+		regions.set(2, getRegion(TEXTURE, 7, 0, true));
+		regions.set(1, getRegion(TEXTURE, 2, 0, true));
 		
 		AnimatedBox2DSprite leftWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
 		anim.animations.put(PlayerAnims.WALK_LEFT, leftWalk);
 		
 		//Idle Right
-		regions = new Array<TextureRegion>(2);
-		regions.setSize(2);
-		regions.set(0, getRegion(playerTexture, 2, 0, false));
-		regions.set(1, getRegion(playerTexture, 3, 0, false));
-		AnimatedBox2DSprite idleRight = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		regions = new Array<TextureRegion>(6);
+		regions.setSize(6);
+		regions.set(0, getRegion(TEXTURE, 2, 0, false));
+		regions.set(1, getRegion(TEXTURE, 3, 0, false));
+		regions.set(2, getRegion(TEXTURE, 2, 0, false));
+		regions.set(3, getRegion(TEXTURE, 3, 0, false));
+			//blink
+		regions.set(4, getRegion(TEXTURE, 2, 0, false));
+		regions.set(5, getRegion(TEXTURE, 5, 0, false));
+		AnimatedBox2DSprite idleRight = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 		anim.animations.put(PlayerAnims.IDLE_RIGHT, idleRight);
 		
 		//Idle Left
-		regions = new Array<TextureRegion>(2);
-		regions.setSize(2);
-		regions.set(0, getRegion(playerTexture, 2, 0, true));
-		regions.set(1, getRegion(playerTexture, 3, 0, true));
-		AnimatedBox2DSprite idleLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		regions = new Array<TextureRegion>(6);
+		regions.setSize(6);
+		regions.set(0, getRegion(TEXTURE, 2, 0, true));
+		regions.set(1, getRegion(TEXTURE, 3, 0, true));
+		regions.set(2, getRegion(TEXTURE, 2, 0, true));
+		regions.set(3, getRegion(TEXTURE, 3, 0, true));
+			//blink
+		regions.set(4, getRegion(TEXTURE, 2, 0, true));
+		regions.set(5, getRegion(TEXTURE, 5, 0, true));
+
+		
+		AnimatedBox2DSprite idleLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 		anim.animations.put(PlayerAnims.IDLE_LEFT, idleLeft);
 		
 		//Jump Right
 		regions = new Array<TextureRegion>(2);
 		regions.setSize(2);
-		regions.set(0, getRegion(playerTexture, 8, 0, false));
-		regions.set(1, getRegion(playerTexture, 9, 0, false));
+		regions.set(0, getRegion(TEXTURE, 0, 1, false));
+		regions.set(1, getRegion(TEXTURE, 1, 1, false));
 		AnimatedBox2DSprite jumpRight = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
 		anim.animations.put(PlayerAnims.JUMP_RIGHT, jumpRight);
 		
 		//Jump Left
 		regions = new Array<TextureRegion>(2);
 		regions.setSize(2);
-		regions.set(0, getRegion(playerTexture, 8, 0, true));
-		regions.set(1, getRegion(playerTexture, 9, 0, true));
+		regions.set(0, getRegion(TEXTURE, 0, 1, true));
+		regions.set(1, getRegion(TEXTURE, 1, 1, true));
 		AnimatedBox2DSprite jumpLeft = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.NORMAL)));
 		anim.animations.put(PlayerAnims.JUMP_LEFT, jumpLeft);
-
 	}
 	
 	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX) {
