@@ -51,7 +51,9 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class GameScreen implements Screen {
 	
-	public static final int VIRTUAL_WIDTH = 240/8;//480
+	public static boolean doneLoading = false;
+	
+	public static final int VIRTUAL_WIDTH = 380/8;//480
 	public static final int VIRTUAL_HEIGHT = 300/8; //320
 	public static final int UNIT = 2;
 	
@@ -95,9 +97,11 @@ public class GameScreen implements Screen {
 
 		world.setContactListener(new Box2DContactListener());
 		
-		engine.addSystem(new LightingSystem(player, world, camera));
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
+		engine.addSystem(new LightingSystem(player, world, camera));
 		
+		//safe
+		doneLoading = true;
 	}
 
 	@Override
@@ -110,7 +114,7 @@ public class GameScreen implements Screen {
 		engine.update(delta);
 		
 		// render
-		b2dRenderer.render(world, camera.combined);
+//		b2dRenderer.render(world, camera.combined);
 		
 		
 		
@@ -128,7 +132,11 @@ public class GameScreen implements Screen {
 	@Override
 	public void resize(int width, int height) {
 		renderingSystem.getViewport().update(width, height, true);
+		engine.getSystem(LightingSystem.class).getRayHandler().useCustomViewport(
+				renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(),
+				renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
 	}
+
 
 	@Override
 	public void pause() {

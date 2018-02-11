@@ -73,7 +73,7 @@ public class Level {
 		
 		float height = 0.5f;
 		
-		if (spacers < 75) { // 75% chance to have floor with one spacer
+		if (spacers < 75) { // 75% chance to have floor with one platform
 			
 //			if (random.nextInt(100) < 80) { // 20% chance one of two floors isn't there
 //				
@@ -107,7 +107,7 @@ public class Level {
 			
 			return new Body[] { newPlatform[0].getBody() };
 			
-		} else if (spacers < 100) { // 25% chance to have 2 spacers
+		} else if (spacers < 100) { // 25% chance to have 2 platform
 			
 			float yPos = 2.0f;
 			Platform[] newPlatform = new Platform[2];

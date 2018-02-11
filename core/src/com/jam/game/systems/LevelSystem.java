@@ -22,12 +22,14 @@ import com.jam.game.levels.Level;
 import com.jam.game.levels.Platform;
 import com.jam.game.screens.GameScreen;
 
+import box2dLight.RayHandler;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class LevelSystem extends EntitySystem {
 	
 	private static final TextureRegion PLATFORM_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
+	RayHandler lightRayHandler;
 	
 //	private final static float INTERVAL = 1.0f/15.0f;
 	private Level level;
@@ -100,9 +102,8 @@ public class LevelSystem extends EntitySystem {
 				one.setSize(1);
 				one.set(0, PLATFORM_TEXTURE);
 				
-//				one.add(LevelSystem.PLATFORM_TEXTURE);
+				one.add(LevelSystem.PLATFORM_TEXTURE);
 				
-				System.out.println(one.toString(", "));
 				final String def = "DEFAULT";
 				animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
 						new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));

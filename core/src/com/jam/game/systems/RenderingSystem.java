@@ -7,12 +7,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.TextureComponent;
@@ -26,28 +28,28 @@ public class RenderingSystem extends SortedIteratingSystem {
 	static final float PPM = 32.0f; //Pixels per meter
 	
     // this gets the height and width of our camera frustrum based off the width and height of the screen and our pixel per meter ratio
-	static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth()/PPM;
-    static final float FRUSTUM_HEIGHT = Gdx.graphics.getHeight()/PPM;
+	static final float FRUSTUM_WIDTH = GameScreen.VIRTUAL_WIDTH;
+    static final float FRUSTUM_HEIGHT = GameScreen.VIRTUAL_HEIGHT;
     
 	public static final float PIXELS_TO_METERS = 1.0f / PPM;
 	
 	// static method to get screen width in meters
     private static Vector2 meterDimensions = new Vector2();
     private static Vector2 pixelDimensions = new Vector2();
-    public static Vector2 getScreenSizeInMeters(){
-        meterDimensions.set(Gdx.graphics.getWidth()*PIXELS_TO_METERS,
-                            Gdx.graphics.getHeight()*PIXELS_TO_METERS);
-        return meterDimensions;
-    }
+//    public static Vector2 getScreenSizeInMeters(){
+//        meterDimensions.set(Gdx.graphics.getWidth()*PIXELS_TO_METERS,
+//                            Gdx.graphics.getHeight()*PIXELS_TO_METERS);
+//        return meterDimensions;
+//    }
     
-    public static Vector2 getScreenInPixels() {
-    	pixelDimensions.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    	return pixelDimensions;
-    }
+//    public static Vector2 getScreenInPixels() {
+//    	pixelDimensions.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//    	return pixelDimensions;
+//    }
     
-    public static float pixelsToMeters(float pixelValue) {
-    	return pixelValue * PIXELS_TO_METERS;
-    }
+//    public static float pixelsToMeters(float pixelValue) {
+//    	return pixelValue * PIXELS_TO_METERS;
+//    }
     
     private SpriteBatch batch;
     private Array<Entity> renderQueue;
@@ -67,9 +69,12 @@ public class RenderingSystem extends SortedIteratingSystem {
         this.batch = batch;  // set our batch to the one supplied in constructor
 
         // set up the camera to match our screen size
-        cam = new OrthographicCamera(FRUSTUM_WIDTH, FRUSTUM_HEIGHT);
-        cam.position.set(FRUSTUM_WIDTH / 2f, FRUSTUM_HEIGHT / 2f, 0);
-        viewport = new FitViewport(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT, cam);
+//        cam = new OrthographicCamera();
+        //cam.position.set(FRUSTUM_WIDTH, FRUSTUM_HEIGHT, 0);
+        viewport = new FitViewport(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT);
+        viewport.apply(true);
+//        viewport.setScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        viewport.setWorldSize(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT);
     }
 
     @Override
@@ -80,8 +85,9 @@ public class RenderingSystem extends SortedIteratingSystem {
 //    	renderQueue.sort(comparator); // TODO
     	
     	//Update camera and sprite batch
-    	cam.update();
-    	batch.setProjectionMatrix(cam.combined);
+    	viewport.getCamera().update();
+    	
+    	batch.setProjectionMatrix(viewport.getCamera().combined);
     	batch.enableBlending();
 //    	batch.begin();
 //    	
@@ -136,7 +142,7 @@ public class RenderingSystem extends SortedIteratingSystem {
         		
         		float _factor = 1.0f;
         		
-        		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, _factor*pixelsToMeters(t.scale.x), _factor*pixelsToMeters(t.scale.y), 0);
+        		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, _factor*(t.scale.x), _factor*(t.scale.y), 0);
         		
     		}
 		} else if (a != null && body != null) {
@@ -149,14 +155,16 @@ public class RenderingSystem extends SortedIteratingSystem {
     			System.out.println(factor);
     		}
 			
-			if (!Mappers.playerMap.has(entity)) {
+//			if (!Mappers.playerMap.has(entity)) {
+//				a.stateTime += deltaTime;
+////				a.animations.get(a.currentAnimation).setScale(factor);
+////				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
+//			} else {
 				a.stateTime += deltaTime;
-				a.animations.get(a.currentAnimation).setScale(factor);
+//				a.animations.get(a.currentAnimation).setScale(PPM);
 				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-			} else {
-				a.stateTime += deltaTime;
-				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-			}
+//			}
+				
 			
 		}
     		
@@ -164,7 +172,7 @@ public class RenderingSystem extends SortedIteratingSystem {
 	}
 	
 	public OrthographicCamera getCamera() {
-		return cam;
+		return (OrthographicCamera) viewport.getCamera();
 	}
 	
 	public SpriteBatch getBatch() {
