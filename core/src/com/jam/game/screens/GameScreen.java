@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -53,8 +54,8 @@ public class GameScreen implements Screen {
 	
 	public static boolean doneLoading = false;
 	
-	public static final int VIRTUAL_WIDTH = 380/8;//480
-	public static final int VIRTUAL_HEIGHT = 300/8; //320
+	public static final int VIRTUAL_WIDTH = 480/10;//380/8;//480
+	public static final int VIRTUAL_HEIGHT = 800/10;//300/8; //320
 	public static final int UNIT = 2;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png");
@@ -87,23 +88,28 @@ public class GameScreen implements Screen {
 		engine.addSystem(new CollisionSystem());
 		
 		controller = new KeyboardController();
-		engine.addSystem(new PlayerControlSystem(controller));
+		engine.addSystem(new PlayerControlSystem(controller, world, camera));
 		
 		
-		b2dRenderer = new Box2DDebugRenderer();
+		b2dRenderer = new Box2DDebugRenderer(false, true, false, false, false, false);
+		b2dRenderer.JOINT_COLOR.set(Color.TAN);
 		
 		player = createPlayer();
 		createFloor();
 
-		world.setContactListener(new Box2DContactListener());
+		world.setContactListener(new Box2DContactListener(world, engine.getSystem(PhysicsSystem.class)));
 		
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		engine.addSystem(new LightingSystem(player, world, camera));
 		
 		//safe
 		doneLoading = true;
+		
+		font.getData().setScale(0.40f);
 	}
-
+	
+	private BitmapFont font = new BitmapFont();
+	
 	@Override
 	public void render(float delta) {
 
@@ -112,6 +118,11 @@ public class GameScreen implements Screen {
 		//world.step(delta, 8, 3);
 		
 		engine.update(delta);
+		
+		SpriteBatch sb = engine.getSystem(RenderingSystem.class).getBatch();
+		sb.begin();
+		font.draw(sb, "move = wsad\nthrow rope = q\nrelease rope = e\nstand still for light", 5, 3);
+		sb.end();
 		
 		// render
 //		b2dRenderer.render(world, camera.combined);
@@ -178,7 +189,7 @@ public class GameScreen implements Screen {
 		FixtureDef playerFixture = new FixtureDef();
 		
 		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(UNIT/2.0f, UNIT);
+		boxShape.setAsBox(UNIT/2.5f, UNIT/1.25f);
 		
 		
 		playerFixture.shape = boxShape;
@@ -205,6 +216,9 @@ public class GameScreen implements Screen {
 		
 		engine.addEntity(entity);
 		boxShape.dispose();
+		
+		// set user data
+		body.b2dBody.setUserData(entity);
 		
 		return entity;
 	}
@@ -282,19 +296,29 @@ public class GameScreen implements Screen {
 		
 		for (Entry<String, AnimatedBox2DSprite> se : anim.animations.entries()) {
 			AnimatedBox2DSprite s = se.value;
-			s.setAdjustHeight(false);
-			s.setAdjustWidth(false);
+//			s.setAdjustHeight(false);
+//			s.setAdjustWidth(false);
 			s.setUseOrigin(false);
-			s.setScale(0.15f);
-			s.setPosition(-UNIT/0.95f, -UNIT/1.25f);
+//			s.setScale(0.15f);
+			s.setScale(1.65f, 1.20f);
+			s.setPosition(0, 0.25f);
+//			s.setPosition(-UNIT/0.95f, -UNIT/1.25f);
 		}
 	}
 	
+//	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX) {
+//		if (flipX) {
+//			return new TextureRegion(tex, (x+1)*32 - 2, y*32, -32, 32);
+//		}
+//		return new TextureRegion(tex, x*32, y*32, 32, 32);		
+//	}
+	
 	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX) {
 		if (flipX) {
-			return new TextureRegion(tex, (x+1)*32 - 2, y*32, -32, 32);
+			return new TextureRegion(tex, (x+1)*32 - 8, y*32 + 8, -16, 24);
 		}
-		return new TextureRegion(tex, x*32, y*32, 32, 32);
+		
+		return new TextureRegion(tex, x*32 + 9, y*32 + 8, 16, 24);
 	}
 	
 	void createFloor() { //https://www.gamedevelopment.blog/full-libgdx-game-tutorial-entities-ashley/

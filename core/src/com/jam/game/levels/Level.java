@@ -18,21 +18,21 @@ public class Level {
 	
 	private static final float SCALE = 1.0f;
 	
-	public static final float MIN_WIDTH = 4.0f / SCALE;
-	public static final float MAX_WIDTH = 5.0f / SCALE;
+	public static final float MIN_WIDTH = 3.50f / SCALE;
+	public static final float MAX_WIDTH = 4.75f / SCALE;
 	
-	public static final float MIN_HEIGHT = 0.45f / SCALE;
-	public static final float MAX_HEIGHT = 0.45f / SCALE;
+	public static final float MIN_HEIGHT = 0.40f / SCALE;
+	public static final float MAX_HEIGHT = 0.41f / SCALE;
 	
 	public static final float MIN_Y_INC = 7.0f / SCALE;
-	public static final float MAX_Y_INC = 7.0f / SCALE;
+	public static final float MAX_Y_INC = 7.1f / SCALE;
 	
 	private Queue<Platform> queue;
 	private Random random;
 	private World world;
 	
 	public Level(World world) {
-		this.queue = new Queue<Platform>(10);
+		this.queue = new Queue<Platform>();
 		this.random = new Random();
 		this.world = world;
 	}
@@ -73,41 +73,42 @@ public class Level {
 		
 		float height = 0.5f;
 		
-		if (spacers < 75) { // 75% chance to have floor with one platform
-			
-//			if (random.nextInt(100) < 80) { // 20% chance one of two floors isn't there
-//				
+//		if (spacers < 75) { // 75% chance to have floor with one platform
+//			
+////			if (random.nextInt(100) < 80) { // 20% chance one of two floors isn't there
+////				
+////			}
+//			
+//			Platform[] newPlatform = new Platform[1];
+//			for (int i=0; i < newPlatform.length; i++) newPlatform[i] = new Platform();
+//			
+//			float xPos, width;
+//			float yPos = 2.0f;
+//			
+//			if (random.nextBoolean()) {
+//				xPos = randomFloatInRange(0, GameScreen.VIRTUAL_WIDTH-MAX_WIDTH);
+//				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
+//			} else {
+//				xPos = randomFloatInRange(MAX_WIDTH, GameScreen.VIRTUAL_WIDTH);
+//				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
+//				xPos -= width;
 //			}
-			
-			Platform[] newPlatform = new Platform[1];
-			for (int i=0; i < newPlatform.length; i++) newPlatform[i] = new Platform();
-			
-			float xPos, width;
-			float yPos = 2.0f;
-			
-			if (random.nextBoolean()) {
-				xPos = randomFloatInRange(0, GameScreen.VIRTUAL_WIDTH-MAX_WIDTH);
-				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-			} else {
-				xPos = randomFloatInRange(MAX_WIDTH, GameScreen.VIRTUAL_WIDTH);
-				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-				xPos -= width;
-			}
-			
-			if (queue.size > 0) {
-				yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
-			}
-			
-			newPlatform[0].set(xPos, yPos, width, height);
-			
-			Body body = Box2dPlatformBuilder.DEFAULT(newPlatform[0]).buildAndDispose(world); // add body to world and retrieve it
-			newPlatform[0].setBody(body);
-			
-			queue.addFirst(newPlatform[0]);
-			
-			return new Body[] { newPlatform[0].getBody() };
-			
-		} else if (spacers < 100) { // 25% chance to have 2 platform
+//			
+//			if (queue.size > 0) {
+//				yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
+//			}
+//			
+//			newPlatform[0].set(xPos, yPos, width, height);
+//			
+//			Body body = Box2dPlatformBuilder.DEFAULT(newPlatform[0]).buildAndDispose(world); // add body to world and retrieve it
+//			newPlatform[0].setBody(body);
+//			
+//			queue.addFirst(newPlatform[0]);
+//			
+//			return new Body[] { newPlatform[0].getBody() };
+//			
+//		} else
+			if (spacers < 100) { // 25% chance to have 2 platform
 			
 			float yPos = 2.0f;
 			Platform[] newPlatform = new Platform[2];
@@ -116,14 +117,14 @@ public class Level {
 			{
 				float xPos, width;
 				
-				if (random.nextBoolean()) {
-					xPos = randomFloatInRange(0, (GameScreen.VIRTUAL_WIDTH/2.0f)-MAX_WIDTH);
+//				if (random.nextBoolean()) {
+					xPos = randomFloatInRange(0, (GameScreen.VIRTUAL_WIDTH/2.0f));
 					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-				} else {
-					xPos = randomFloatInRange(MAX_WIDTH, GameScreen.VIRTUAL_WIDTH/2.0f);
-					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-					xPos -= width;
-				}
+//				} else {
+//					xPos = randomFloatInRange(MAX_WIDTH, GameScreen.VIRTUAL_WIDTH/2.0f);
+//					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
+//					xPos -= width;
+//				}
 				
 				if (queue.size > 0) {
 					yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
@@ -137,19 +138,19 @@ public class Level {
 				queue.addFirst(newPlatform[0]);
 			}
 			
-			float spacer = randomFloatInRange(1.7f, 2.0f);
+			float spacer = randomFloatInRange(3.8f, 7.6f);
 			
 			{
 				float xPos, width;
 				
-				if (random.nextBoolean()) {
-					xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f)+spacer, GameScreen.VIRTUAL_WIDTH-MAX_WIDTH);
+//				if (random.nextBoolean()) {
+					xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f)+spacer, GameScreen.VIRTUAL_WIDTH);
 					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-				} else {
-					xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f)+MAX_WIDTH+spacer, GameScreen.VIRTUAL_WIDTH);
-					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-					xPos -= width;
-				}
+//				} else {
+//					xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f)-MAX_WIDTH+spacer, GameScreen.VIRTUAL_WIDTH);
+//					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
+//					xPos -= width;
+//				}
 				
 				// use same yPos as last...
 				

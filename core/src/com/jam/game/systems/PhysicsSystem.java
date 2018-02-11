@@ -4,9 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jam.game.components.BodyComponent;
+import com.jam.game.components.StateComponent;
 import com.jam.game.components.TransformComponent;
 
 import utils.Mappers;
@@ -17,6 +19,17 @@ public class PhysicsSystem extends IteratingSystem{
     
     private World world;
     private Array<Entity> bodiesQueue;
+    
+    // add joints to this array to be deleted follow the next world.step(...)
+    private final Array<StateComponent> stateJointDestructionArray = new Array<StateComponent>();
+    
+    // mark a statecomponent's joint for eventual destruction after world.step
+    // only works if join not already in array
+    public void safelyMarkJointForDestruction(StateComponent sc) {
+    	if (!stateJointDestructionArray.contains(sc, true)) { // true means ==
+    		stateJointDestructionArray.add(sc);
+    	}
+    }
     
     @SuppressWarnings("unchecked")
    	public PhysicsSystem(World world) {
@@ -46,6 +59,13 @@ public class PhysicsSystem extends IteratingSystem{
 			tfm.pos.y = pos.y;
 		}
     	
+		// destroy all marked joints
+		for (StateComponent sc : stateJointDestructionArray) {
+			world.destroyJoint(sc.ropeJoint);
+			sc.ropeJoint = null;
+		}
+		
+		stateJointDestructionArray.clear();
     	bodiesQueue.clear();
     }
     
@@ -53,4 +73,5 @@ public class PhysicsSystem extends IteratingSystem{
     protected void processEntity(Entity entity, float deltaTime) {
     	bodiesQueue.add(entity);
     }
+    
 }

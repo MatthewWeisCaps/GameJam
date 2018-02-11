@@ -27,7 +27,7 @@ public class Game implements ApplicationListener {
 		gameScreen = new GameScreen();
 		deathScreen = new DeathScreen();
 		
-		currentScreen = startScreen;
+		currentScreen = gameScreen;
 				
 		currentScreen.show();
 	}

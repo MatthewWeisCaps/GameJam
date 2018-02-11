@@ -1,19 +1,24 @@
 package com.jam.game.systems;
 
+import java.util.Random;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.TextureComponent;
@@ -51,12 +56,14 @@ public class LevelSystem extends EntitySystem {
 //		LevelSystem.PLATFORM_TEXTURE.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 	}
 	
+	Random random = new Random();
+	
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-				
+		
 		// calc new y
-		yHeight = Math.max(calculateYHeight(), playerBody.getPosition().y);
+		yHeight = calculateYHeight();//Math.max(calculateYHeight(), playerBody.getPosition().y);
 		
 		// interpolate
 //		cam.position.y = Interpolation.smooth.apply(cam.position.y, yHeight, delta);
@@ -68,7 +75,14 @@ public class LevelSystem extends EntitySystem {
 		// check lowest platform for removal, if so remove its body and entity from engine and world
 		Platform platform = level.getTail();
 		if (platform != null && platform.getBody() != null && platform.getBody().getUserData() != null) {
-			if (cam.project(new Vector3(platform.getBody().getPosition(), 0.0f)).y < -5.0f) {
+			
+			FitViewport viewport = this.getEngine().getSystem(RenderingSystem.class).getViewport();
+			Camera cam = viewport.getCamera();
+			cam.update();
+			Vector3 coords3D = cam.project(new Vector3(platform.getBody().getPosition(), 0.0f), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+//			Vector2 coords = new Vector2(coords3D.x, coords3D.y);
+			
+			if (coords3D.y < -5.0f) {
 				
 //				System.out.println(cam.project(new Vector3(platform.getBody().getPosition(), 0.0f)).y);
 						
@@ -83,21 +97,21 @@ public class LevelSystem extends EntitySystem {
 		}
 		
 		// check if new platform needs to be spawned
-		while (level.getPlatformQueue().size < 10) {
+		while (level.getPlatformQueue().size < 30) {
 			PooledEngine engine = (PooledEngine)this.getEngine(); // ref engine
 			
-			Entity entity = engine.createEntity(); // make entity
-			
-			BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
-//			TextureComponent texC = engine.createComponent(TextureComponent.class);
-			AnimationComponent animC = engine.createComponent(AnimationComponent.class);
-			TransformComponent transC = engine.createComponent(TransformComponent.class);
 			
 			for (Body b : level.spawnNext2(engine)) {
+				
+				Entity entity = engine.createEntity(); // make entity
+				
+				BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
+				AnimationComponent animC = engine.createComponent(AnimationComponent.class);
+				TransformComponent transC = engine.createComponent(TransformComponent.class);
+				
 				bodyC.b2dBody = b;
 				bodyC.b2dBody.setUserData(entity);
 				
-//				texC.region = LevelSystem.PLATFORM_TEXTURE;
 				Array<TextureRegion> one = new Array<TextureRegion>();
 				one.setSize(1);
 				one.set(0, PLATFORM_TEXTURE);
@@ -110,7 +124,6 @@ public class LevelSystem extends EntitySystem {
 				animC.currentAnimation = def;
 				
 				entity.add(bodyC);
-//				entity.add(texC);
 				entity.add(animC);
 				entity.add(transC);
 				
@@ -153,7 +166,10 @@ public class LevelSystem extends EntitySystem {
 	
 	// test 1
 	private float calculateYHeight() {
-		return 3.0f * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
+		return 1.60f * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
 	}
 	
+	private float randomFloatInRange(float start, float end) {
+		return (random.nextFloat()* (end - start))+start;
+	}
 }

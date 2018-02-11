@@ -2,26 +2,29 @@ package com.jam.game.systems;
 
 import java.util.Comparator;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
-import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
+import com.jam.game.components.StateComponent;
 import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.screens.GameScreen;
 
 import utils.Mappers;
+import utils.PlayerAnims;
 
 public class RenderingSystem extends SortedIteratingSystem {
 
@@ -54,7 +57,7 @@ public class RenderingSystem extends SortedIteratingSystem {
     private SpriteBatch batch;
     private Array<Entity> renderQueue;
     private Comparator<Entity> comparator;
-    private OrthographicCamera cam;
+//    private OrthographicCamera cam;
     private FitViewport viewport;
     
     @SuppressWarnings("unchecked")
@@ -75,6 +78,8 @@ public class RenderingSystem extends SortedIteratingSystem {
         viewport.apply(true);
 //        viewport.setScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 //        viewport.setWorldSize(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT);
+        
+        shapeRenderer.setColor(Color.TAN);
     }
 
     @Override
@@ -121,6 +126,7 @@ public class RenderingSystem extends SortedIteratingSystem {
     }
     
     float factor = 1.0f;
+    private ShapeRenderer shapeRenderer = new ShapeRenderer();
     
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
@@ -132,6 +138,7 @@ public class RenderingSystem extends SortedIteratingSystem {
 		AnimationComponent a = Mappers.animationMap.get(entity);
 		BodyComponent body = Mappers.bodyMap.get(entity);
 		
+		//state.beginThrowingRopeTime + 0.80f > GdxAI.getTimepiece().getTime()
 		if (tex != null) {
 			if(tex.region != null) {
         		float width = tex.region.getRegionWidth();
@@ -146,28 +153,84 @@ public class RenderingSystem extends SortedIteratingSystem {
         		
     		}
 		} else if (a != null && body != null) {
+			StateComponent state = Mappers.stateMap.get(entity);
 			
-			if (Gdx.input.isKeyJustPressed(Keys.T)) {
-    			factor += deltaTime;
-    		} else if (Gdx.input.isKeyJustPressed(Keys.Y)) {
-    			factor -= deltaTime;
-    		} else if (Gdx.input.isKeyJustPressed(Keys.U)) {
-    			System.out.println(factor);
-    		}
 			
 //			if (!Mappers.playerMap.has(entity)) {
 //				a.stateTime += deltaTime;
 ////				a.animations.get(a.currentAnimation).setScale(factor);
 ////				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
 //			} else {
-				a.stateTime += deltaTime;
-//				a.animations.get(a.currentAnimation).setScale(PPM);
-				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-//			}
+			if (state != null && state.isThrowingRope) {
+				batch.end();
+				Gdx.gl.glLineWidth(2);
+				shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//				shapeRenderer.setColor(Color.TAN); // done above
 				
-			
+				Vector2 origin = null;
+				Vector2 dest = null;
+				
+				if (state.ropeJointDef != null) {
+					origin = state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA);
+					dest = state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB);
+				} else {
+					System.out.println("here");
+									
+					origin = state.invalidThrowStart;
+					dest = state.invalidThrowEnd;
+					System.out.println(origin + "; " + dest);
+
+				}
+				
+				
+				float progress = (GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME;
+				
+				float x = MathUtils.lerp(origin.x, dest.x, progress);
+				float y = MathUtils.lerp(origin.y, dest.y, progress);
+				Vector2 target = new Vector2(x, y);
+				
+				
+//						origin.interpolate(state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB),
+//								(GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME,
+//								Interpolation.linear);
+				
+//				System.out.println((GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME);
+				shapeRenderer.line(origin, target);
+						
+//				System.out.println(state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA) + " to " + 
+//						state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA)
+//						.interpolate(state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB),
+//								(GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME,
+//						Interpolation.linear));
+				shapeRenderer.end();
+				Gdx.gl.glLineWidth(1);
+				batch.begin();
+//				a.stateTime += deltaTime;
+//				if (a.currentAnimation == PlayerAnims.IDLE_LEFT || a.currentAnimation == PlayerAnims.JUMP_LEFT
+//						|| a.currentAnimation == PlayerAnims.WALK_LEFT) {
+//					a.animations.get(PlayerAnims.IDLE_LEFT).draw(batch, body.b2dBody);
+//				} else {
+//					a.animations.get(PlayerAnims.IDLE_RIGHT).draw(batch, body.b2dBody);
+//				}
+				
+			} else if (state != null && state.isSwinging && state.ropeJoint != null) {
+				batch.end();
+				Gdx.gl.glLineWidth(2);
+				shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
+				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+//					shapeRenderer.setColor(Color.TAN); // done above
+				shapeRenderer.line(state.ropeJoint.getAnchorA(), state.ropeJoint.getAnchorB());
+				shapeRenderer.end();
+				Gdx.gl.glLineWidth(1);
+				batch.begin();
+			}
 		}
-    		
+		
+		a.stateTime += deltaTime;
+//		a.animations.get(a.currentAnimation).setScale(PPM);
+		a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
+    	
 		batch.end();
 	}
 	
