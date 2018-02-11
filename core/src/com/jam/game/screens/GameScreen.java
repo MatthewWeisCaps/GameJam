@@ -69,7 +69,7 @@ public class GameScreen implements Screen {
 	
 	@Override
 	public void show() {
-		world = new World(new Vector2(0, -10f), true);
+		world = new World(new Vector2(0, -20f), true);
 		
 		sb = new SpriteBatch();
 		//Create our rendering system
@@ -95,9 +95,9 @@ public class GameScreen implements Screen {
 
 		world.setContactListener(new Box2DContactListener());
 		
+		engine.addSystem(new LightingSystem(player, world, camera));
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		
-		engine.addSystem(new LightingSystem(player, world, camera));
 	}
 
 	@Override
@@ -110,7 +110,7 @@ public class GameScreen implements Screen {
 		engine.update(delta);
 		
 		// render
-//		b2dRenderer.render(world, camera.combined);
+		b2dRenderer.render(world, camera.combined);
 		
 		
 		

@@ -91,30 +91,57 @@ public class LevelSystem extends EntitySystem {
 			AnimationComponent animC = engine.createComponent(AnimationComponent.class);
 			TransformComponent transC = engine.createComponent(TransformComponent.class);
 			
-			bodyC.b2dBody = level.spawnNext((PooledEngine) this.getEngine()); // populate components
-			bodyC.b2dBody.setUserData(entity);
+			for (Body b : level.spawnNext2(engine)) {
+				bodyC.b2dBody = b;
+				bodyC.b2dBody.setUserData(entity);
+				
+//				texC.region = LevelSystem.PLATFORM_TEXTURE;
+				Array<TextureRegion> one = new Array<TextureRegion>();
+				one.setSize(1);
+				one.set(0, PLATFORM_TEXTURE);
+				
+//				one.add(LevelSystem.PLATFORM_TEXTURE);
+				
+				System.out.println(one.toString(", "));
+				final String def = "DEFAULT";
+				animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+						new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+				animC.currentAnimation = def;
+				
+				entity.add(bodyC);
+//				entity.add(texC);
+				entity.add(animC);
+				entity.add(transC);
+				
+				engine.addEntity(entity);
+				
+				System.out.println("spawned platform.");
+			}
 			
-//			texC.region = LevelSystem.PLATFORM_TEXTURE;
-			Array<TextureRegion> one = new Array<TextureRegion>();
-			one.setSize(1);
-			one.set(0, PLATFORM_TEXTURE);
-			
-//			one.add(LevelSystem.PLATFORM_TEXTURE);
-			
-			System.out.println(one.toString(", "));
-			final String def = "DEFAULT";
-			animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-					new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-			animC.currentAnimation = def;
-			
-			entity.add(bodyC);
-//			entity.add(texC);
-			entity.add(animC);
-			entity.add(transC);
-			
-			engine.addEntity(entity);
-			
-			System.out.println("spawned platform.");
+////			bodyC.b2dBody = level.spawnNext((PooledEngine) this.getEngine()); // populate components
+//			bodyC.b2dBody.setUserData(entity);
+//			
+////			texC.region = LevelSystem.PLATFORM_TEXTURE;
+//			Array<TextureRegion> one = new Array<TextureRegion>();
+//			one.setSize(1);
+//			one.set(0, PLATFORM_TEXTURE);
+//			
+////			one.add(LevelSystem.PLATFORM_TEXTURE);
+//			
+//			System.out.println(one.toString(", "));
+//			final String def = "DEFAULT";
+//			animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+//					new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+//			animC.currentAnimation = def;
+//			
+//			entity.add(bodyC);
+////			entity.add(texC);
+//			entity.add(animC);
+//			entity.add(transC);
+//			
+//			engine.addEntity(entity);
+//			
+//			System.out.println("spawned platform.");
 		}
 		
 	}
