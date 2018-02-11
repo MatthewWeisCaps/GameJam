@@ -15,7 +15,7 @@ import com.jam.game.components.TextureComponent;
 
 public class AnimationSystem extends SortedIteratingSystem {
 	public AnimationSystem(Family family, Comparator<Entity> comparator) {
-		super(family, comparator);
+		super(family, comparator, Priority.RENDER.PRIORITY);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -63,7 +63,7 @@ public class DeathScreen implements Screen{
 		Texture t = new Texture("game_over.png");
 		
 		//Death Animation
-		Array<TextureRegion> r = new Array<TextureRegion>(43);
+		Array<TextureRegion> r = new Array<TextureRegion>(2);
 		r.setSize(2);
 		for(int i=0; i<2; i++) {
 			r.set(i, new TextureRegion(t, i*32, 0, 32, 32));

@@ -139,7 +139,7 @@ public class Box2dPlatformBuilder implements Disposable {
 		builder.setBodyType(BodyType.StaticBody);
 		builder.setBodyPosition(0, 0);
 		builder.setDensity(1.0f);
-		builder.setFriction(1.0f);
+		builder.setFriction(0.0f);
 		builder.setRestitution(0.0f);
 		
 		PolygonShape shape = new PolygonShape();

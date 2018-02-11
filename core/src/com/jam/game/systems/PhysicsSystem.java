@@ -20,7 +20,7 @@ public class PhysicsSystem extends IteratingSystem{
     
     @SuppressWarnings("unchecked")
    	public PhysicsSystem(World world) {
-    	super(Family.all(BodyComponent.class, TransformComponent.class).get());
+    	super(Family.all(BodyComponent.class, TransformComponent.class).get(), Priority.PHYSICS.PRIORITY);
     	this.world = world;
     	this.bodiesQueue = new Array<Entity>();
     }
@@ -28,13 +28,14 @@ public class PhysicsSystem extends IteratingSystem{
     @Override
     public void update(float deltaTime) {
     	super.update(deltaTime);
-    	float frameTime = Math.min(deltaTime, 0.25f);
-    	accumulator += frameTime;
     	
-    	while(accumulator >= MAX_STEP_TIME) {
+//    	float frameTime = Math.min(deltaTime, 0.25f);
+//    	accumulator += frameTime;
+    	
+//    	if(accumulator >= MAX_STEP_TIME) {
     		world.step(MAX_STEP_TIME, 8, 3);
-    		accumulator -= MAX_STEP_TIME;
-    	}
+//    		accumulator -= MAX_STEP_TIME;
+//    	}
     	
     	//entity queue
 		for(Entity entity : bodiesQueue) {

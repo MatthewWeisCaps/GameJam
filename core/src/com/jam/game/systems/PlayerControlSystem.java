@@ -24,7 +24,7 @@ public class PlayerControlSystem extends IteratingSystem {
 	
 	@SuppressWarnings("unchecked")
 	public PlayerControlSystem(KeyboardController keybrd) {
-		super(Family.all(PlayerComponent.class).get());
+		super(Family.all(PlayerComponent.class).get(), Priority.INPUT.PRIORITY);
 		controller = keybrd;
 	}
 	
@@ -53,18 +53,24 @@ public class PlayerControlSystem extends IteratingSystem {
 			}
 		}
 		
-		if(controller.left) {
+		int _physXDir = 0;
+		if(controller.left && !controller.right) {
 			lastXDir = -1;
-			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, -5, 0.2f), body.b2dBody.getLinearVelocity().y);
-		}
-		if(controller.right) {
+			_physXDir = -1;
+			body.b2dBody.setLinearVelocity(_physXDir*5, body.b2dBody.getLinearVelocity().y);
+		} else if(controller.right && !controller.left) {
 			lastXDir = 1;
-			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, 5, 0.2f), body.b2dBody.getLinearVelocity().y);
+			_physXDir = 1;
+			body.b2dBody.setLinearVelocity(_physXDir*5, body.b2dBody.getLinearVelocity().y);
+		} else {
+			_physXDir = 0;
+			body.b2dBody.setLinearVelocity(0.0f, body.b2dBody.getLinearVelocity().y);
 		}
+		
 		
 		if(controller.jump && (state.get() == StateComponent.STATE_NORMAL || state.get() == StateComponent.STATE_MOVING || jumpCount < MAX_JUMPS)) {
 			body.b2dBody.setLinearVelocity(body.b2dBody.getLinearVelocity().x, 0);
-			body.b2dBody.applyLinearImpulse(0, 7.5f, body.b2dBody.getWorldCenter().x,body.b2dBody.getWorldCenter().y, true);
+			body.b2dBody.applyLinearImpulse(0, 10.0f, body.b2dBody.getWorldCenter().x,body.b2dBody.getWorldCenter().y, true);
 			jumpCount++;
 			state.set(StateComponent.STATE_FALLING);
 		}

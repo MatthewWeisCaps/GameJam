@@ -16,10 +16,10 @@ import com.jam.game.screens.GameScreen;
 
 public class Level {
 	
-	private static final float SCALE = 3.0f;
+	private static final float SCALE = 1.0f;
 	
-	public static final float MIN_WIDTH = 3.0f / SCALE;
-	public static final float MAX_WIDTH = 6.0f / SCALE;
+	public static final float MIN_WIDTH = 3.0f / (SCALE*2);
+	public static final float MAX_WIDTH = 6.0f / (SCALE*2);
 	
 	public static final float MIN_HEIGHT = 0.45f / SCALE;
 	public static final float MAX_HEIGHT = 1.25f / SCALE;

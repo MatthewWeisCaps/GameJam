@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -34,10 +35,13 @@ import com.jam.game.levels.Level;
 import com.jam.game.systems.AnimationSystem;
 import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.LevelSystem;
+import com.jam.game.systems.LightingSystem;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
 import com.jam.game.systems.RenderingSystem;
 
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
 import utils.Mappers;
 import utils.PlayerAnims;
 import controllers.KeyboardController;
@@ -62,6 +66,7 @@ public class GameScreen implements Screen {
 	RenderingSystem renderingSystem;
 	Entity player;
 	
+	
 	@Override
 	public void show() {
 		world = new World(new Vector2(0, -10f), true);
@@ -78,7 +83,7 @@ public class GameScreen implements Screen {
 		engine.addSystem(renderingSystem);
 		engine.addSystem(new PhysicsSystem(world));
 		engine.addSystem(new CollisionSystem());
-				
+		
 		controller = new KeyboardController();
 		engine.addSystem(new PlayerControlSystem(controller));
 		
@@ -91,6 +96,8 @@ public class GameScreen implements Screen {
 		world.setContactListener(new Box2DContactListener());
 		
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
+		
+		engine.addSystem(new LightingSystem(player, world, camera));
 	}
 
 	@Override
@@ -99,11 +106,21 @@ public class GameScreen implements Screen {
 		// logic
 		
 		//world.step(delta, 8, 3);
+		
 		engine.update(delta);
 		
 		// render
-		b2dRenderer.render(world, camera.combined);
+//		b2dRenderer.render(world, camera.combined);
 		
+		
+		
+//		engine.getSystem(RenderingSystem.class).getBatch().begin();
+//		
+//		Mappers.animationMap.get(player).animations.get(Mappers.animationMap.get(player).currentAnimation)
+//			.draw(engine.getSystem(RenderingSystem.class).getBatch(), Mappers.bodyMap.get(player).b2dBody);
+//		engine.getSystem(RenderingSystem.class).getBatch().end();
+//		
+		Gdx.graphics.setTitle(Integer.toString(Gdx.graphics.getFramesPerSecond()));
 		//camera.lookAt(100.0f, 100.0f, 0.0f);
 //		camera.position.set(new Vector3(100.0f, 100.0f, 0.0f));
 	}
@@ -158,7 +175,7 @@ public class GameScreen implements Screen {
 		
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
-		playerFixture.friction = 1.0f;
+		playerFixture.friction = 0.0f;
 		
 		body.b2dBody.createFixture(playerFixture);
 		
@@ -289,7 +306,7 @@ public class GameScreen implements Screen {
 		
 		floorFixture.shape = boxShape;
 		floorFixture.restitution = 0.0f;
-		floorFixture.friction = 1.0f;
+		floorFixture.friction = 0.0f;
 		
 		body.b2dBody.createFixture(floorFixture);
 		
@@ -302,62 +319,6 @@ public class GameScreen implements Screen {
 		engine.addEntity(entity);
 		
 				
-	}
-	
-	void setupInputHandler() {
-		Gdx.input.setInputProcessor(new InputProcessor() {
-
-			
-			@Override
-			public boolean keyDown(int keycode) {
-				switch(keycode) {
-					case Keys.ESCAPE:
-						Gdx.app.exit();
-				}
-				return false;
-			}
-
-			@Override
-			public boolean keyUp(int keycode) {
-				return false;
-			}
-
-			@Override
-			public boolean keyTyped(char character) {
-				return false;
-			}
-
-			@Override
-			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-				return false;
-			}
-
-			@Override
-			public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-				return false;
-			}
-
-			@Override
-			public boolean touchDragged(int screenX, int screenY, int pointer) {
-				return false;
-			}
-
-			@Override
-			public boolean mouseMoved(int screenX, int screenY) {
-				return false;
-			}
-
-			@Override
-			public boolean scrolled(int amount) {
-				camera.zoom += 0.05 * amount;
-				
-//				camera.position.set(camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0.0f)));
-				
-				camera.update();
-				return false;
-			}
-			
-		});
 	}
 
 }

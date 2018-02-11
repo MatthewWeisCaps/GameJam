@@ -15,7 +15,7 @@ public class CollisionSystem extends IteratingSystem{
 	
 	@SuppressWarnings("unchecked")
 	public CollisionSystem() {
-		super(Family.all(CollisionComponent.class, PlayerComponent.class).get());
+		super(Family.all(CollisionComponent.class, PlayerComponent.class).get(), Priority.PHYSICS.PRIORITY);
 		
 		cm = ComponentMapper.getFor(CollisionComponent.class);
 		pm = ComponentMapper.getFor(PlayerComponent.class);

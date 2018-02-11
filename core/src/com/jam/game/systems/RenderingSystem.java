@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
@@ -54,18 +55,12 @@ public class RenderingSystem extends SortedIteratingSystem {
     private OrthographicCamera cam;
     private FitViewport viewport;
     
-    private ComponentMapper<TextureComponent> textureM;
-    private ComponentMapper<TransformComponent> transformM;
-    
     @SuppressWarnings("unchecked")
 	public RenderingSystem(SpriteBatch batch) {
         // gets all entities with a TransofmComponent and TextureComponent
-        super(Family.all(TransformComponent.class).one(TextureComponent.class, AnimationComponent.class).get(), new ZComparator());
+        super(Family.all(TransformComponent.class).one(TextureComponent.class, AnimationComponent.class).get(),
+        		new ZComparator(), Priority.RENDER.PRIORITY);
         
-        //creates out componentMappers
-        textureM = ComponentMapper.getFor(TextureComponent.class);
-        transformM = ComponentMapper.getFor(TransformComponent.class);
-
         // create the array for sorting entities
         renderQueue = new Array<Entity>();
      
@@ -82,50 +77,98 @@ public class RenderingSystem extends SortedIteratingSystem {
     	super.update(deltaTime);
     	
     	//Sort render Queue based on Z index
-    	renderQueue.sort(comparator); // TODO
+//    	renderQueue.sort(comparator); // TODO
     	
     	//Update camera and sprite batch
     	cam.update();
     	batch.setProjectionMatrix(cam.combined);
     	batch.enableBlending();
-    	batch.begin();
-    	
-    	//Each entity in our render queue
-    	for(Entity e : renderQueue) {
-    		TextureComponent tex = textureM.get(e);
-    		TransformComponent t = transformM.get(e);
-    		AnimationComponent a = Mappers.animationMap.get(e);
-    		BodyComponent body = Mappers.bodyMap.get(e);
-    		
-    		if (tex != null) {
-    			if(tex.region != null) {
-            		float width = tex.region.getRegionWidth();
-            		float height = tex.region.getRegionHeight();
-            		
-            		float originX = width/2.0f;
-            		float originY = height/2.0f;
-            		
-            		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, pixelsToMeters(t.scale.x), pixelsToMeters(t.scale.y), 0);
-        		}
-    		} else if (a != null && body != null) {
-    			a.stateTime += deltaTime;
-    			a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-    		} else {
-    			continue;
-    		}
-    	}
-    	
-    	batch.end();
-    	renderQueue.clear();
+//    	batch.begin();
+//    	
+//    	//Each entity in our render queue
+//    	for(Entity e : renderQueue) {
+//    		TextureComponent tex = Mappers.textureMap.get(e);
+//    		TransformComponent t = Mappers.transformMap.get(e);
+//    		AnimationComponent a = Mappers.animationMap.get(e);
+//    		BodyComponent body = Mappers.bodyMap.get(e);
+//    		
+//    		if (tex != null) {
+//    			if(tex.region != null) {
+//            		float width = tex.region.getRegionWidth();
+//            		float height = tex.region.getRegionHeight();
+//            		
+//            		float originX = width/2.0f;
+//            		float originY = height/2.0f;
+//            		
+//            		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, pixelsToMeters(t.scale.x), pixelsToMeters(t.scale.y), 0);
+//        		}
+//    		} else if (a != null && body != null) {
+//    			a.stateTime += deltaTime;
+//    			a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
+//    		} else {
+//    			continue;
+//    		}
+//    	}
+//    	
+//    	batch.end();
+//    	renderQueue.clear();
     }
+    
+    float factor = 1.0f;
     
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
-		renderQueue.add(entity);
+//		renderQueue.add(entity);
+		batch.begin();
+		
+		TextureComponent tex = Mappers.textureMap.get(entity);
+		TransformComponent t = Mappers.transformMap.get(entity);
+		AnimationComponent a = Mappers.animationMap.get(entity);
+		BodyComponent body = Mappers.bodyMap.get(entity);
+		
+		if (tex != null) {
+			if(tex.region != null) {
+        		float width = tex.region.getRegionWidth();
+        		float height = tex.region.getRegionHeight();
+        		
+        		float originX = width/2.0f;
+        		float originY = height/2.0f;
+        		
+        		float _factor = 1.0f;
+        		
+        		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, _factor*pixelsToMeters(t.scale.x), _factor*pixelsToMeters(t.scale.y), 0);
+        		
+    		}
+		} else if (a != null && body != null) {
+			
+			if (Gdx.input.isKeyJustPressed(Keys.T)) {
+    			factor += deltaTime;
+    		} else if (Gdx.input.isKeyJustPressed(Keys.Y)) {
+    			factor -= deltaTime;
+    		} else if (Gdx.input.isKeyJustPressed(Keys.U)) {
+    			System.out.println(factor);
+    		}
+			
+			if (!Mappers.playerMap.has(entity)) {
+				a.stateTime += deltaTime;
+				a.animations.get(a.currentAnimation).setScale(factor);
+				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
+			} else {
+				a.stateTime += deltaTime;
+				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
+			}
+			
+		}
+    		
+		batch.end();
 	}
 	
 	public OrthographicCamera getCamera() {
 		return cam;
+	}
+	
+	public SpriteBatch getBatch() {
+		return batch;
 	}
 	
 	public FitViewport getViewport() {
