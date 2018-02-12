@@ -18,8 +18,7 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.screens.GameScreen;
-
-import utils.Mappers;
+import com.jam.game.utils.Mappers;
 
 public class RenderingSystem extends SortedIteratingSystem {
 

@@ -29,6 +29,7 @@ import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.components.TypeComponent;
+import com.jam.game.controllers.KeyboardController;
 import com.jam.game.levels.Level;
 import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.LevelSystem;
@@ -36,10 +37,9 @@ import com.jam.game.systems.LightingSystem;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
 import com.jam.game.systems.RenderingSystem;
+import com.jam.game.utils.Mappers;
+import com.jam.game.utils.PlayerAnims;
 
-import utils.Mappers;
-import utils.PlayerAnims;
-import controllers.KeyboardController;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 

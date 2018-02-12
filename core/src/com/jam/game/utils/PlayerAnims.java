@@ -1,4 +1,4 @@
-package utils;
+package com.jam.game.utils;
 
 public class PlayerAnims {
 	

@@ -19,10 +19,9 @@ import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
-
-import controllers.KeyboardController;
-import utils.Mappers;
-import utils.PlayerAnims;
+import com.jam.game.controllers.KeyboardController;
+import com.jam.game.utils.Mappers;
+import com.jam.game.utils.PlayerAnims;
 
 public class PlayerControlSystem extends IteratingSystem {
 	KeyboardController controller;

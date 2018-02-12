@@ -1,4 +1,4 @@
-package controllers;
+package com.jam.game.controllers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;

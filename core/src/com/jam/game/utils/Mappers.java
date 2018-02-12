@@ -1,4 +1,4 @@
-package utils;
+package com.jam.game.utils;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.jam.game.components.*;

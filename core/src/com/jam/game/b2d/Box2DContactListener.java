@@ -10,8 +10,7 @@ import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 import com.jam.game.components.StateComponent;
 import com.jam.game.systems.PhysicsSystem;
-
-import utils.Mappers;
+import com.jam.game.utils.Mappers;
 
 public class Box2DContactListener implements ContactListener {
 

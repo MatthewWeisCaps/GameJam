@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 import com.jam.game.components.PlayerComponent;
+import com.jam.game.utils.Mappers;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
-import utils.Mappers;
 
 public class LightingSystem extends EntitySystem implements Disposable {
 	

@@ -1,4 +1,4 @@
-package utils;
+package com.jam.game.utils;
 
 public enum CollisionGroup {
 	WORLD(0x01), POWER(0x02);
