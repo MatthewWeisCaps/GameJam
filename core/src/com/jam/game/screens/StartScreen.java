@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,9 +14,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.Game;
+
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class StartScreen implements Screen{
+	private Game game;
 	
 	public final static int VIRTUAL_WIDTHSS = 32;
 	public final static int VIRTUAL_HEIGHTSS = 32;
@@ -30,6 +34,10 @@ public class StartScreen implements Screen{
     
     int onScreen = 0;
     
+    public StartScreen(Game game){
+    	this.game = game;
+    }
+    
 	@Override
 	public void show() {
 		int old_Width = Gdx.graphics.getWidth();
@@ -38,6 +46,7 @@ public class StartScreen implements Screen{
 		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
 		
 		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
+		
 		music.setVolume(music.getVolume()/3);
 		music.play();
 		music.setLooping(true);
@@ -59,27 +68,21 @@ public class StartScreen implements Screen{
 		sprite.update(delta);
 		sprite.draw(batch);
 		
-		if (sprite.isAnimationFinished()) {
-			if(onScreen == 0)
-				sprite = new AnimatedSprite(animationRegions.get(++onScreen));
-		}
-		
 		batch.end();
-	}
-	
-	public void checkStartGameOnEnter() {
-		if(sprite.isAnimationFinished() && onScreen == 1) {
-			sprite = new AnimatedSprite(animationRegions.get(++onScreen));
+		
+		if (sprite.isAnimationFinished()) {
+			if(onScreen == 0){
+				sprite = new AnimatedSprite(animationRegions.get(++onScreen));
+			} else if(onScreen == 1){
+				if(Gdx.input.isKeyJustPressed(Keys.ENTER)){
+					sprite = new AnimatedSprite(animationRegions.get(++onScreen));
+				}
+			}else if(onScreen >= 2){
+				music.pause();
+				this.game.moveToNextScreen(ScreenType.PLAY);
+			}
+			
 		}
-	}
-	
-	public boolean canStartGame() {
-		if(onScreen >= 2 && sprite.isAnimationFinished()) {
-			music.pause();
-			//TODO Play start sound here
-			return true;
-		}
-		return false;
 	}
 	
 	public ArrayList<Animation<TextureRegion>> getAnimationRegions() {

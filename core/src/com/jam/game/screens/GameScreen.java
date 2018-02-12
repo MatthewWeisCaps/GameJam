@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
+import com.jam.game.Game;
 import com.jam.game.b2d.Box2DContactListener;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
@@ -50,8 +51,9 @@ public class GameScreen implements Screen {
 	public static final int VIRTUAL_HEIGHT = 800/10;//300/8; //320
 	public static final int UNIT = 2;
 	
+	private Game game;
+	
 	public boolean playerDeath = false;
-	public boolean finishedDeathStuff = false;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png");
 	
@@ -66,10 +68,13 @@ public class GameScreen implements Screen {
 	RenderingSystem renderingSystem;
 	Entity player;
 	
+	public GameScreen(Game game){
+    	this.game = game;
+    }
+	
 	@Override
 	public void show() {
 		playerDeath = false;
-		finishedDeathStuff = false;
 		gameMusic.setVolume(gameMusic.getVolume()/3);
 		gameMusic.play();
 		gameMusic.setLooping(true);
@@ -78,7 +83,6 @@ public class GameScreen implements Screen {
 		int old_Width = Gdx.graphics.getWidth();
 		int old_Height = Gdx.graphics.getHeight();
 		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
-		//Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
 		
 		world = new World(new Vector2(0, -20f), true);
 		
@@ -112,10 +116,6 @@ public class GameScreen implements Screen {
 		
 	@Override
 	public void render(float delta) {
-		// logic
-		
-		//world.step(delta, 8, 3);
-		
 		engine.update(delta);
 		
 		if(!playerDeath) {
@@ -147,7 +147,8 @@ public class GameScreen implements Screen {
 		deathSound.setOnCompletionListener(new Music.OnCompletionListener() {
 		    @Override
 		    public void onCompletion(Music aMusic) {  
-		        finishedDeathStuff = true;
+		    	gameMusic.pause();
+		    	game.moveToNextScreen(ScreenType.DEATH);
 		    }
 		});		
 	}

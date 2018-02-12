@@ -12,21 +12,27 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.jam.game.Game;
+
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class DeathScreen implements Screen{
 	public final static int VIRTUAL_WIDTH = 32;
 	public final static int VIRTUAL_HEIGHT = 32;
 
+	private Game game;
+	
 	private Music music;
-	
-	public boolean playAgain = false;
-	
+		
 	OrthographicCamera camera;
     FitViewport viewport;
     SpriteBatch batch;
     AnimatedSprite sprite;
     Animation<TextureRegion> animationRegion;
+    
+    public DeathScreen(Game game){
+    	this.game = game;
+    }
     
 	@Override
 	public void show() {
@@ -61,8 +67,7 @@ public class DeathScreen implements Screen{
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ANY_KEY)) {
 			music.pause();
-			music.dispose();
-			playAgain = true; 
+			this.game.moveToNextScreen(ScreenType.START); 
 		}
 	}
 	
