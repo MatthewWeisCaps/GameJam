@@ -29,21 +29,6 @@ public class RenderingSystem extends SortedIteratingSystem {
     static final float FRUSTUM_HEIGHT = GameScreen.VIRTUAL_HEIGHT;
     
 	public static final float PIXELS_TO_METERS = 1.0f / PPM;
-	
-//    public static Vector2 getScreenSizeInMeters(){
-//        meterDimensions.set(Gdx.graphics.getWidth()*PIXELS_TO_METERS,
-//                            Gdx.graphics.getHeight()*PIXELS_TO_METERS);
-//        return meterDimensions;
-//    }
-    
-//    public static Vector2 getScreenInPixels() {
-//    	pixelDimensions.set(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//    	return pixelDimensions;
-//    }
-    
-//    public static float pixelsToMeters(float pixelValue) {
-//    	return pixelValue * PIXELS_TO_METERS;
-//    }
     
     private SpriteBatch batch;
 //    private OrthographicCamera cam;
@@ -57,13 +42,8 @@ public class RenderingSystem extends SortedIteratingSystem {
      
         this.batch = batch;  // set our batch to the one supplied in constructor
 
-        // set up the camera to match our screen size
-//        cam = new OrthographicCamera();
-        //cam.position.set(FRUSTUM_WIDTH, FRUSTUM_HEIGHT, 0);
         viewport = new FitViewport(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT);
-        viewport.apply(true);
-//        viewport.setScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//        viewport.setWorldSize(GameScreen.VIRTUAL_WIDTH, GameScreen.VIRTUAL_HEIGHT);
+
         
         shapeRenderer.setColor(Color.TAN);
     }
@@ -72,43 +52,11 @@ public class RenderingSystem extends SortedIteratingSystem {
     public void update(float deltaTime) {
     	super.update(deltaTime);
     	
-    	//Sort render Queue based on Z index
-//    	renderQueue.sort(comparator); // TODO
-    	
     	//Update camera and sprite batch
     	viewport.getCamera().update();
     	
     	batch.setProjectionMatrix(viewport.getCamera().combined);
     	batch.enableBlending();
-//    	batch.begin();
-//    	
-//    	//Each entity in our render queue
-//    	for(Entity e : renderQueue) {
-//    		TextureComponent tex = Mappers.textureMap.get(e);
-//    		TransformComponent t = Mappers.transformMap.get(e);
-//    		AnimationComponent a = Mappers.animationMap.get(e);
-//    		BodyComponent body = Mappers.bodyMap.get(e);
-//    		
-//    		if (tex != null) {
-//    			if(tex.region != null) {
-//            		float width = tex.region.getRegionWidth();
-//            		float height = tex.region.getRegionHeight();
-//            		
-//            		float originX = width/2.0f;
-//            		float originY = height/2.0f;
-//            		
-//            		batch.draw(tex.region, t.pos.x - originX, t.pos.y - originY, originX, originY, width, height, pixelsToMeters(t.scale.x), pixelsToMeters(t.scale.y), 0);
-//        		}
-//    		} else if (a != null && body != null) {
-//    			a.stateTime += deltaTime;
-//    			a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-//    		} else {
-//    			continue;
-//    		}
-//    	}
-//    	
-//    	batch.end();
-//    	renderQueue.clear();
     }
     
     float factor = 1.0f;
@@ -116,7 +64,6 @@ public class RenderingSystem extends SortedIteratingSystem {
     
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
-//		renderQueue.add(entity);
 		batch.begin();
 		
 		TextureComponent tex = Mappers.textureMap.get(entity);
@@ -141,18 +88,11 @@ public class RenderingSystem extends SortedIteratingSystem {
 		} else if (a != null && body != null) {
 			StateComponent state = Mappers.stateMap.get(entity);
 			
-			
-//			if (!Mappers.playerMap.has(entity)) {
-//				a.stateTime += deltaTime;
-////				a.animations.get(a.currentAnimation).setScale(factor);
-////				a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
-//			} else {
 			if (state != null && state.isThrowingRope) {
 				batch.end();
 				Gdx.gl.glLineWidth(2);
 				shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
 				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//				shapeRenderer.setColor(Color.TAN); // done above
 				
 				Vector2 origin = null;
 				Vector2 dest = null;
@@ -177,35 +117,17 @@ public class RenderingSystem extends SortedIteratingSystem {
 				Vector2 target = new Vector2(x, y);
 				
 				
-//						origin.interpolate(state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB),
-//								(GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME,
-//								Interpolation.linear);
-				
-//				System.out.println((GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME);
 				shapeRenderer.line(origin, target);
 						
-//				System.out.println(state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA) + " to " + 
-//						state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA)
-//						.interpolate(state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB),
-//								(GdxAI.getTimepiece().getTime()-state.beginThrowingRopeTime)/PlayerControlSystem.ROPE_CAST_TIME,
-//						Interpolation.linear));
 				shapeRenderer.end();
 				Gdx.gl.glLineWidth(1);
 				batch.begin();
-//				a.stateTime += deltaTime;
-//				if (a.currentAnimation == PlayerAnims.IDLE_LEFT || a.currentAnimation == PlayerAnims.JUMP_LEFT
-//						|| a.currentAnimation == PlayerAnims.WALK_LEFT) {
-//					a.animations.get(PlayerAnims.IDLE_LEFT).draw(batch, body.b2dBody);
-//				} else {
-//					a.animations.get(PlayerAnims.IDLE_RIGHT).draw(batch, body.b2dBody);
-//				}
 				
 			} else if (state != null && state.isSwinging && state.ropeJoint != null) {
 				batch.end();
 				Gdx.gl.glLineWidth(2);
 				shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
 				shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-//					shapeRenderer.setColor(Color.TAN); // done above
 				shapeRenderer.line(state.ropeJoint.getAnchorA(), state.ropeJoint.getAnchorB());
 				shapeRenderer.end();
 				Gdx.gl.glLineWidth(1);
@@ -214,7 +136,6 @@ public class RenderingSystem extends SortedIteratingSystem {
 		}
 		
 		a.stateTime += deltaTime;
-//		a.animations.get(a.currentAnimation).setScale(PPM);
 		a.animations.get(a.currentAnimation).draw(batch, body.b2dBody);
     	
 		batch.end();

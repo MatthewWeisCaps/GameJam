@@ -79,18 +79,13 @@ public class GameScreen implements Screen {
 		gameMusic.play();
 		gameMusic.setLooping(true);
 		
-		//Gross hack 
-		int old_Width = Gdx.graphics.getWidth();
-		int old_Height = Gdx.graphics.getHeight();
-		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
-		
 		world = new World(new Vector2(0, -20f), true);
 		
 		sb = new SpriteBatch();
 		//Create our rendering system
 		renderingSystem = new RenderingSystem(sb);
 		camera = renderingSystem.getCamera();
-				
+		
 		engine = new PooledEngine();
 		
 		//Add all relevant systems
@@ -112,6 +107,8 @@ public class GameScreen implements Screen {
 		
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		engine.addSystem(new LightingSystem(player, world, camera));
+		
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 		
 	@Override

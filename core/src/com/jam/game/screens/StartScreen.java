@@ -21,8 +21,8 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 public class StartScreen implements Screen{
 	private Game game;
 	
-	public final static int VIRTUAL_WIDTHSS = 32;
-	public final static int VIRTUAL_HEIGHTSS = 32;
+	public final static int VIRTUAL_WIDTH = 32;
+	public final static int VIRTUAL_HEIGHT = 32;
 	
 	private Music music;
 	
@@ -40,23 +40,20 @@ public class StartScreen implements Screen{
     
 	@Override
 	public void show() {
-		int old_Width = Gdx.graphics.getWidth();
-		int old_Height = Gdx.graphics.getHeight();
-		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
-		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
-		
 		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
 		
 		music.setVolume(music.getVolume()/3);
 		music.play();
 		music.setLooping(true);
 		
-		camera = new OrthographicCamera(VIRTUAL_WIDTHSS, VIRTUAL_HEIGHTSS);
-		viewport = new FitViewport(VIRTUAL_WIDTHSS, VIRTUAL_HEIGHTSS, camera);
+		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 		batch = new SpriteBatch();
 		
 		animationRegions = getAnimationRegions();
 		sprite = new AnimatedSprite(animationRegions.get(onScreen));
+		
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
 	@Override

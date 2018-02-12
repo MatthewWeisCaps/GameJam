@@ -35,12 +35,7 @@ public class DeathScreen implements Screen{
     }
     
 	@Override
-	public void show() {
-		int old_Width = Gdx.graphics.getWidth();
-		int old_Height = Gdx.graphics.getHeight();
-		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
-		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
-				
+	public void show() {		
 		music = Gdx.audio.newMusic(Gdx.files.internal("death_music_2_cut.mp3"));
 		music.setVolume(music.getVolume()/3);
 		music.play();
@@ -52,6 +47,9 @@ public class DeathScreen implements Screen{
 		
 		animationRegion = getAnimationRegions();
 		sprite = new AnimatedSprite(animationRegion);
+		
+        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
 	}
 
 	@Override
