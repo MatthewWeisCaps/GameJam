@@ -1,7 +1,5 @@
 package com.jam.game.systems;
 
-import java.util.Comparator;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
@@ -11,10 +9,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
@@ -24,7 +20,6 @@ import com.jam.game.components.TransformComponent;
 import com.jam.game.screens.GameScreen;
 
 import utils.Mappers;
-import utils.PlayerAnims;
 
 public class RenderingSystem extends SortedIteratingSystem {
 
@@ -36,9 +31,6 @@ public class RenderingSystem extends SortedIteratingSystem {
     
 	public static final float PIXELS_TO_METERS = 1.0f / PPM;
 	
-	// static method to get screen width in meters
-    private static Vector2 meterDimensions = new Vector2();
-    private static Vector2 pixelDimensions = new Vector2();
 //    public static Vector2 getScreenSizeInMeters(){
 //        meterDimensions.set(Gdx.graphics.getWidth()*PIXELS_TO_METERS,
 //                            Gdx.graphics.getHeight()*PIXELS_TO_METERS);
@@ -55,8 +47,6 @@ public class RenderingSystem extends SortedIteratingSystem {
 //    }
     
     private SpriteBatch batch;
-    private Array<Entity> renderQueue;
-    private Comparator<Entity> comparator;
 //    private OrthographicCamera cam;
     private FitViewport viewport;
     
@@ -65,9 +55,6 @@ public class RenderingSystem extends SortedIteratingSystem {
         // gets all entities with a TransofmComponent and TextureComponent
         super(Family.all(TransformComponent.class).one(TextureComponent.class, AnimationComponent.class).get(),
         		new ZComparator(), Priority.RENDER.PRIORITY);
-        
-        // create the array for sorting entities
-        renderQueue = new Array<Entity>();
      
         this.batch = batch;  // set our batch to the one supplied in constructor
 

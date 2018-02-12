@@ -6,7 +6,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.DefaultTimepiece;
 import com.badlogic.gdx.ai.GdxAI;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.jam.game.screens.DeathScreen;
 import com.jam.game.screens.GameScreen;
@@ -31,19 +30,19 @@ public class Game implements ApplicationListener {
 	
 	void setStartScreen() {
 		if(currentScreen != null) currentScreen.dispose();
-		startScreen = new StartScreen(this);
+		startScreen = new StartScreen();
 		setScreen(startScreen);
 	}
 
 	void setGameScreen(){
 		if(currentScreen != null) currentScreen.dispose();
-		gameScreen = new GameScreen(this);
+		gameScreen = new GameScreen();
 		setScreen(gameScreen);
 	}
 	
 	void setDeathScreen() {
 		if(currentScreen != null) currentScreen.dispose();
-		deathScreen = new DeathScreen(this);
+		deathScreen = new DeathScreen();
 		setScreen(deathScreen);
 	}
 	
@@ -57,7 +56,7 @@ public class Game implements ApplicationListener {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		if (currentScreen == gameScreen && gameScreen.doneLoading) {
+		if (currentScreen == gameScreen) {
 			GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
 			currentScreen.render(GdxAI.getTimepiece().getDeltaTime());
 			
@@ -71,14 +70,6 @@ public class Game implements ApplicationListener {
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
 			Gdx.app.exit();
-		
-//		if(Gdx.input.isKeyJustPressed(Keys.R)){
-//			void setGameScreen(){
-//				if(currentScreen != null) currentScreen.dispose();
-//				gameScreen = new GameScreen(this);
-//				setScreen(gameScreen);
-//			}
-//		}
 		
 		if(currentScreen == startScreen) {
 			if(Gdx.input.isKeyJustPressed(Keys.ENTER))

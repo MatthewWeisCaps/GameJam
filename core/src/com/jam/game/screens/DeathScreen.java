@@ -1,7 +1,5 @@
 package com.jam.game.screens;
 
-import java.util.Random;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
@@ -9,14 +7,11 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.jam.game.Game;
-
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class DeathScreen implements Screen{
@@ -25,7 +20,7 @@ public class DeathScreen implements Screen{
 
 	private Music music;
 	
-	public static boolean playAgain = false;
+	public boolean playAgain = false;
 	
 	OrthographicCamera camera;
     FitViewport viewport;
@@ -33,23 +28,15 @@ public class DeathScreen implements Screen{
     AnimatedSprite sprite;
     Animation<TextureRegion> animationRegion;
     
-    Random r = new Random();
-    
-    private Game game;
-    public DeathScreen(Game game) {
-    	this.game = game;
-    }
-    
 	@Override
 	public void show() {
 		int old_Width = Gdx.graphics.getWidth();
 		int old_Height = Gdx.graphics.getHeight();
 		Gdx.graphics.setWindowedMode(old_Width - 1, old_Height - 1);
 		Gdx.graphics.setWindowedMode(old_Width + 1, old_Height + 1);
-		
-		float songNum = r.nextFloat();
-		
+				
 		music = Gdx.audio.newMusic(Gdx.files.internal("death_music_2_cut.mp3"));
+		music.setVolume(music.getVolume()/3);
 		music.play();
 		music.setLooping(false);
 		

@@ -2,16 +2,10 @@ package com.jam.game.systems;
 
 import java.util.Comparator;
 
-import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.jam.game.components.AnimationComponent;
-import com.jam.game.components.BodyComponent;
-import com.jam.game.components.StateComponent;
-import com.jam.game.components.TextureComponent;
 
 public class AnimationSystem extends SortedIteratingSystem {
 	public AnimationSystem(Family family, Comparator<Entity> comparator) {

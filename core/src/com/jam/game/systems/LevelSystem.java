@@ -5,23 +5,18 @@ import java.util.Random;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
-import com.jam.game.components.TextureComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
 import com.jam.game.levels.Platform;
@@ -38,11 +33,11 @@ public class LevelSystem extends EntitySystem {
 	
 	private float camSpeed = 1.60f;
 	private float camSpeedMax = 2.75f;
+	private float camSpeedIncrease = 0.00001f;
 //	private final static float INTERVAL = 1.0f/15.0f;
 	private Level level;
 	private OrthographicCamera cam;
 	private float yHeight = 0.0f;
-	private Body playerBody;
 	
 //	private float ySpeedInitial = 20.0f;
 //	private float ySpeedCoefficient = 0.8f;
@@ -53,7 +48,6 @@ public class LevelSystem extends EntitySystem {
 		super(Priority.PHYSICS.PRIORITY);
 		this.level = level;
 		this.cam = cam;
-		this.playerBody = playerBody;
 		
 //		LevelSystem.PLATFORM_TEXTURE.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 	}
@@ -169,14 +163,10 @@ public class LevelSystem extends EntitySystem {
 	
 	// test 1
 	private float calculateYHeight() {
-		camSpeed += 0.001f;
+		camSpeed += camSpeedIncrease;
 		
 		if(camSpeed > camSpeedMax) camSpeed = camSpeedMax;
 		
 		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
-	}
-	
-	private float randomFloatInRange(float start, float end) {
-		return (random.nextFloat()* (end - start))+start;
 	}
 }

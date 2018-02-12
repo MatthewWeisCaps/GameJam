@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Joint;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.jam.game.components.BodyComponent;
@@ -14,9 +13,7 @@ import com.jam.game.components.TransformComponent;
 import utils.Mappers;
 
 public class PhysicsSystem extends IteratingSystem{
-	private static final float MAX_STEP_TIME = 1/60f;
-    private static float accumulator = 0f;
-    
+	private static final float MAX_STEP_TIME = 1/60f;    
     private World world;
     private Array<Entity> bodiesQueue;
     

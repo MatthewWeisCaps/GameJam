@@ -1,0 +1,20 @@
+1) Re-factor the code...to much trash
+
+2) Fix the strange camera bugs...we shouldn't have to reload the screen height oninit for the FitViewPort to work
+
+3) DO THE SCORE!
+
+4) Add static lights to some of the platforms
+
+5) Add lantern objects that will increase light dist for n amount of time
+
+6) Have n types of hats that have different power ups
+
+7) Add traps
+
+
+
+
+END GAME IDEAS:
+
+1) Maybe make it two players, the player that is higher will control the light, race to see who can go the farthest 
