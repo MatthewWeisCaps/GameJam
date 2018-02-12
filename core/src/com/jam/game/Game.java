@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ai.DefaultTimepiece;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
@@ -71,6 +72,14 @@ public class Game implements ApplicationListener {
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
 			Gdx.app.exit();
 		
+//		if(Gdx.input.isKeyJustPressed(Keys.R)){
+//			void setGameScreen(){
+//				if(currentScreen != null) currentScreen.dispose();
+//				gameScreen = new GameScreen(this);
+//				setScreen(gameScreen);
+//			}
+//		}
+		
 		if(currentScreen == startScreen) {
 			if(Gdx.input.isKeyJustPressed(Keys.ENTER))
 				startScreen.checkStartGameOnEnter();
@@ -78,17 +87,20 @@ public class Game implements ApplicationListener {
 				//startScreen.dispose();
 				//currentScreen.pause();
 				setGameScreen();
+				
+				GdxAI.setTimepiece(new DefaultTimepiece());
+//				GdxAI.getTimepiece()
 			}
 		}
 		
-		/*if(currentScreen == deathScreen) {
+		if(currentScreen == deathScreen) {
 			if(deathScreen.playAgain) {
 				//startScreen.dispose();
 				//gameScreen.dispose();
 //				setGameScreen();
 				setStartScreen();
 			}
-		}*/
+		}
 	}
 	
 	@Override

@@ -76,7 +76,6 @@ public class DeathScreen implements Screen{
 			music.pause();
 			music.dispose();
 			playAgain = true; 
-			Gdx.app.exit();
 		}
 	}
 	
