@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -25,21 +26,26 @@ import com.jam.game.Game;
 import com.jam.game.b2d.Box2DContactListener;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
-import com.jam.game.components.CollisionComponent;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.components.TypeComponent;
 import com.jam.game.controllers.KeyboardController;
 import com.jam.game.levels.Level;
+import com.jam.game.powerup.Powerup;
 import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.LevelSystem;
 import com.jam.game.systems.LightingSystem;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
+import com.jam.game.systems.PlayerSystem;
 import com.jam.game.systems.RenderingSystem;
+import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
+import com.jam.game.utils.enums.Category;
+import com.jam.game.utils.enums.Mask;
+import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
@@ -97,7 +103,7 @@ public class GameScreen implements Screen {
 		engine.addSystem(new PlayerControlSystem(controller, world, camera));
 		
 		
-		b2dRenderer = new Box2DDebugRenderer(false, true, false, false, false, false);
+		b2dRenderer = new Box2DDebugRenderer(true, true, false, false, false, false);
 		b2dRenderer.JOINT_COLOR.set(Color.TAN);
 		
 		player = createPlayer();
@@ -108,13 +114,23 @@ public class GameScreen implements Screen {
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		engine.addSystem(new LightingSystem(player, world, camera));
 		
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		engine.addSystem(new PlayerSystem(player));
 	}
 		
 	@Override
 	public void render(float delta) {
+		for(Entity e : EntityManager.entitiesToRemove){
+			if(Mappers.bodyMap.get(e) == null || Mappers.powerupMap.get(e) == null) continue;
+			
+			Powerup p = Mappers.powerupMap.get(e).powerup;
+			p.removeLightSystem();
+			Body b = Mappers.bodyMap.get(e).b2dBody;
+			
+			this.world.destroyBody(b);
+			this.engine.removeEntity(e);
+		}
 		engine.update(delta);
-		
+		//b2dRenderer.render(world, camera.combined);
 		if(!playerDeath) {
 			Vector3 player3D = camera.project(new Vector3(Mappers.bodyMap.get(player).b2dBody.getPosition(), 0.0f), renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(), renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
 			
@@ -156,7 +172,6 @@ public class GameScreen implements Screen {
 		TransformComponent pos = engine.createComponent(TransformComponent.class);
 		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
 		PlayerComponent player = engine.createComponent(PlayerComponent.class);
-		CollisionComponent col = engine.createComponent(CollisionComponent.class);
 		TypeComponent t = engine.createComponent(TypeComponent.class);
 		StateComponent st = engine.createComponent(StateComponent.class);
 		
@@ -174,8 +189,11 @@ public class GameScreen implements Screen {
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
 		playerFixture.friction = 0.0f;
-		
+		playerFixture.filter.categoryBits = Category.PLAYER.getValue();
+		playerFixture.filter.maskBits = Mask.PLAYER.getValue();
 		body.b2dBody.createFixture(playerFixture);
+		
+		body.b2dBody.setUserData(TypeComponent.PLAYER);
 		
 		pos.pos.set(0,0,0);
 		t.type = TypeComponent.PLAYER;
@@ -185,11 +203,11 @@ public class GameScreen implements Screen {
 		
 		anim.currentAnimation = PlayerAnims.WALK_RIGHT;
 		
+		player.changeDist(-40); //Adds cool effect on game start
 		entity.add(body);
 		entity.add(pos);
 		entity.add(anim);
 		entity.add(player);
-		entity.add(col);
 		entity.add(t);
 		entity.add(st);
 		
@@ -275,13 +293,9 @@ public class GameScreen implements Screen {
 				
 		for (Entry<String, AnimatedBox2DSprite> se : anim.animations.entries()) {
 			AnimatedBox2DSprite s = se.value;
-//			s.setAdjustHeight(false);
-//			s.setAdjustWidth(false);
 			s.setUseOrigin(false);
-//			s.setScale(0.15f);
 			s.setScale(1.65f, 1.20f);
 			s.setPosition(0, 0.25f);
-//			s.setPosition(-UNIT/0.95f, -UNIT/1.25f);
 		}
 	}
 	

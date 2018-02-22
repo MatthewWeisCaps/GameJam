@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.Game;
+import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
@@ -52,8 +53,6 @@ public class StartScreen implements Screen{
 		
 		animationRegions = getAnimationRegions();
 		sprite = new AnimatedSprite(animationRegions.get(onScreen));
-		
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
 	@Override

@@ -15,10 +15,5 @@ public class KeyboardController {
 		left = Gdx.input.isKeyPressed(Keys.A);
 
 		right = Gdx.input.isKeyPressed(Keys.D);
-
-		// temp
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-			Gdx.app.exit();
-		}
 	}
 }

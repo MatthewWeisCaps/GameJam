@@ -11,6 +11,9 @@ import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 import com.jam.game.levels.Platform;
+import com.jam.game.powerup.Powerup;
+import com.jam.game.utils.enums.Category;
+import com.jam.game.utils.enums.Mask;
 
 /*
  * Builder for platforms.
@@ -152,9 +155,28 @@ public class Box2dPlatformBuilder implements Disposable {
 	public static Box2dPlatformBuilder DEFAULT(Platform platform) {
 		Box2dPlatformBuilder builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
 		builder.setBodyPosition(platform.x, platform.y); 	
+		
+		Filter f = new Filter();
+		f.categoryBits = Category.WALL.getValue();
+		f.maskBits = Mask.WALL.getValue();
+		builder.setFilter(f);
+		
 		return builder;
 	}
-
+	
+	public static Box2dPlatformBuilder DEFAULT(Powerup powerup) {
+		Box2dPlatformBuilder builder = Box2dPlatformBuilder.DEFAULT(powerup.width, powerup.height);
+		builder.setBodyPosition(powerup.x, powerup.y); 	
+		builder.isSensor(true);
+		
+		Filter f = new Filter();
+		f.categoryBits = Category.POWERUP.getValue();
+		f.maskBits = Mask.POWERUP.getValue();
+		builder.setFilter(f);
+		
+		return builder;
+	}
+	
 	@Override
 	public void dispose() {
 		b2dShape.dispose();

@@ -26,6 +26,7 @@ public class CollisionSystem extends IteratingSystem{
 		CollisionComponent cc = cm.get(entity);
 		
 		Entity collidedEntity = cc.collisionEntity;
+		
 		if(collidedEntity != null) {
 			TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
 			if(type != null) {

@@ -22,6 +22,7 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.controllers.KeyboardController;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
+import com.jam.game.utils.enums.Category;
 
 public class PlayerControlSystem extends IteratingSystem {
 	KeyboardController controller;
@@ -33,7 +34,7 @@ public class PlayerControlSystem extends IteratingSystem {
 	int speed = 10;
 	
 	float distSubValue = -0.05f;
-	float distAddValue = 0.40f;
+	float distAddValue = 0.30f; //was .40
 	
 	boolean qHit = false;
 	
@@ -120,17 +121,14 @@ public class PlayerControlSystem extends IteratingSystem {
 				System.out.println("end 1 (handled by playerController)");
 				this.getEngine().getSystem(PhysicsSystem.class).safelyMarkJointForDestruction(state);
 				
-//				body.b2dBody.applyForceToCenter(body.b2dBody.getLinearVelocity().cpy().scl(3.0f), true);
 				body.b2dBody.getLinearVelocity().scl(6.0f);
 				
 				
 			} else if (controller.left && !controller.right) {
 				body.b2dBody.applyForceToCenter(swingForce_left, true);
-				p.changeDist(distSubValue);
 				anim.currentAnimation = PlayerAnims.JUMP_LEFT;
 			} else if(controller.right && !controller.left) {
 				body.b2dBody.applyForceToCenter(swingForce_right, true);
-				p.changeDist(distSubValue);
 				anim.currentAnimation = PlayerAnims.JUMP_RIGHT;
 			} else {
 				
@@ -151,12 +149,10 @@ public class PlayerControlSystem extends IteratingSystem {
 			
 			if (controller.left && !controller.right) {
 				body.b2dBody.setLinearVelocity(-speed*1.25f, body.b2dBody.getLinearVelocity().y);
-				p.changeDist(distSubValue);
 				anim.currentAnimation = PlayerAnims.JUMP_LEFT;
 				return;
 			} else if(controller.right && !controller.left) {
 				body.b2dBody.setLinearVelocity(speed*1.25f, body.b2dBody.getLinearVelocity().y);
-				p.changeDist(distSubValue);
 				anim.currentAnimation = PlayerAnims.JUMP_RIGHT;
 				return;
 			}
@@ -210,17 +206,14 @@ public class PlayerControlSystem extends IteratingSystem {
 		
 		switch(state.get()) {
 			case StateComponent.STATE_INAIR:
-				p.changeDist(distSubValue);
 				anim.currentAnimation = lastXDir > 0 ? PlayerAnims.JUMP_RIGHT : PlayerAnims.JUMP_LEFT;
 				break;
 			case StateComponent.STATE_MOVING:
-				p.changeDist(distSubValue);
 				anim.currentAnimation = lastXDir > 0 ? PlayerAnims.WALK_RIGHT : PlayerAnims.WALK_LEFT;
 				break;
 			case StateComponent.STATE_HIT:
 				break;
 			default:
-				p.changeDist(distAddValue);
 				anim.currentAnimation = lastXDir > 0 ? PlayerAnims.IDLE_RIGHT : PlayerAnims.IDLE_LEFT;
 				break;
 		}
@@ -247,8 +240,14 @@ public class PlayerControlSystem extends IteratingSystem {
 				
 				RopeJointDef jointDef = new RopeJointDef();
 				jointDef.bodyA = body.b2dBody;
+				
 				jointDef.bodyB = callback.fixture.getBody();
+				
+				System.out.println("HIT : " + callback.fixture.getFilterData().categoryBits + " CHECKING: " + Category.POWERUP.getValue());
 				jointDef.collideConnected = true;
+
+				state.validThrow = callback.fixture.getFilterData().categoryBits != Category.POWERUP.getValue();
+				
 				jointDef.localAnchorA.set(Vector2.Zero);
 				jointDef.localAnchorB.set(callback.fixture.getBody().getLocalPoint(callback.point));
 
@@ -256,24 +255,10 @@ public class PlayerControlSystem extends IteratingSystem {
 				// make length of rope equal to dist between player and fixture when rope is thrown (to avoid awkward drop-off)
 				final float distance = jointDef.bodyA.getWorldPoint(jointDef.localAnchorA).dst(jointDef.bodyB.getWorldPoint(jointDef.localAnchorB));
 				
-//				System.out.println(distance + " vs. " + MAX_ROPE_LENGTH);
-//				System.out.println("=> " + jointDef.maxLength);
-				
 				if (distance < MAX_ROPE_LENGTH) {
 					
 					// rope len between 3.0 to MAX_ROPE_LENGTH, but prefers user's grab distance when possible
 					jointDef.maxLength = Math.max(3.0f, Math.min(distance, MAX_ROPE_LENGTH));
-					
-					
-					// cut some length off rope if player grounded so they can still swing.
-//					if (!(state.get() != StateComponent.STATE_INAIR)) {
-//						jointDef.maxLength *= 0.90;
-//					} else {
-//						jointDef.maxLength *= 0.90;
-//					}
-					
-//					state.ropeJoint = (RopeJoint) world.createJoint(jointDef);
-//					state.isSwinging = true;
 					
 					state.validThrow = true;
 				} else {
@@ -287,13 +272,9 @@ public class PlayerControlSystem extends IteratingSystem {
 				state.beginThrowingRopeTime = GdxAI.getTimepiece().getTime();
 				state.ropeJointDef = jointDef;
 				state.isThrowingRope = true;
-			} else {
-//				float angle = body.b2dBody.getPosition().angle(coords);
-//				float dx = Math.abs(body.b2dBody.getPosition().x - coords.x);
-//				float dy = Math.abs(body.b2dBody.getPosition().y - coords.y);
-//				
-				float x = (body.b2dBody.getPosition().x+coords.x);//(float) Math.sqrt(MAX_ROPE_LENGTH*MAX_ROPE_LENGTH - dy*dy);
-				float y = (body.b2dBody.getPosition().y+coords.y);//(float) Math.sqrt(MAX_ROPE_LENGTH*MAX_ROPE_LENGTH - dx*dx);
+			} else {	
+				float x = (body.b2dBody.getPosition().x+coords.x);
+				float y = (body.b2dBody.getPosition().y+coords.y);
 				
 				Vector2 missCoords = new Vector2(x, y);
 				
@@ -302,11 +283,6 @@ public class PlayerControlSystem extends IteratingSystem {
 				
 				missCoords.scl(ratio); // TODO fix len of missed ropes w/ no raycast return
 				
-				
-//				Vector2 missCoords = coords.cpy().sub(body.b2dBody.getPosition()).rotate90(1); //body.b2dBody.getPosition().cpy().sub(coords);
-				
-//				RopeJointDef jointDef = new RopeJointDef(); // joint def not filled in, but ok because never used for creation in this instance
-//				jointDef.maxLength = MAX_ROPE_LENGTH;
 				state.validThrow = false;
 				state.beginThrowingRopeTime = GdxAI.getTimepiece().getTime();
 				state.ropeJointDef = null;

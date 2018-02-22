@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Pool.Poolable;
 public class TypeComponent implements Component, Poolable {
 	public static final int PLAYER = 0;
 	public static final int WALL = 1;
+	public static final int POWERUP = 2;
 	public static final int DANGER = 3;
 	public static final int OTHER = 4;
 	

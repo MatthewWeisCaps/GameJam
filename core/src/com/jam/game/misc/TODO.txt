@@ -18,3 +18,5 @@
 END GAME IDEAS:
 
 1) Maybe make it two players, the player that is higher will control the light, race to see who can go the farthest 
+
+2) Swing points (should fall through, but can swing on)

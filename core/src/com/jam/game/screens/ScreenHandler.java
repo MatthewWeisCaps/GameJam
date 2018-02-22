@@ -2,10 +2,12 @@ package com.jam.game.screens;
 
 import java.util.HashMap;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.DefaultTimepiece;
 import com.badlogic.gdx.ai.GdxAI;
 import com.jam.game.Game;
+import com.jam.game.utils.enums.ScreenType;
 
 public class ScreenHandler {
 	
@@ -19,7 +21,7 @@ public class ScreenHandler {
 		this.screens = new HashMap<ScreenType, Screen>();
 		
 		this.g = game;
-		this.current = ScreenType.START;
+		this.current = ScreenType.PLAY;
 		
 		screens.put(ScreenType.START, new StartScreen(this.g));
 		screens.put(ScreenType.PAUSE, new PauseScreen(this.g));
@@ -31,7 +33,9 @@ public class ScreenHandler {
 	
 	public void showCurrentScreen(){
 		GdxAI.setTimepiece(new DefaultTimepiece());
+		
 		this.screens.get(this.current).show();
+		this.screens.get(this.current).resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
 	public void moveToScreenAndDispose(ScreenType newScreen){

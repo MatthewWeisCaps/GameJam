@@ -6,7 +6,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Queue;
 import com.jam.game.b2d.Box2dPlatformBuilder;
+import com.jam.game.powerup.Powerup;
 import com.jam.game.screens.GameScreen;
+import com.jam.game.utils.Rando;
+import com.jam.game.utils.enums.PowerupType;
 
 public class Level {
 	
@@ -98,6 +101,7 @@ public class Level {
 				newPlatform[0].set(xPos, yPos, width, height);
 				
 				Body body = Box2dPlatformBuilder.DEFAULT(newPlatform[0]).buildAndDispose(world); // add body to world and retrieve it
+				
 				newPlatform[0].setBody(body);
 				
 				queue.addFirst(newPlatform[0]);
@@ -134,6 +138,32 @@ public class Level {
 			return null;
 		}
 		
+	}
+	
+	public Powerup spawnPowerUp(float platformX, float platformY, PooledEngine engine){
+		Powerup p = new Powerup();
+		
+//		float yPos = 2.0f;
+//		float xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f), GameScreen.VIRTUAL_WIDTH);
+//		
+//		if(queue.size > 0){
+//			int index = Rando.getRandomBetweenInt(queue.size);
+//			xPos = queue.get(index).x - queue.get(index).width/2;
+//			yPos = queue.get(index).y - 16;
+//		}
+		float xPos = platformX + MIN_WIDTH/6;
+		float yPos = platformY + MAX_HEIGHT*4;
+		
+		p.set(xPos, yPos, 1f, 1f);
+		
+		Body body = Box2dPlatformBuilder.DEFAULT(p).build(world);
+		p.setBody(body);
+		
+		PowerupType puT = Rando.getRandomNumber() > 0.0f ? PowerupType.LIGHT : PowerupType.HELMET; 
+		p.setType(puT);
+		if(p.getType() == PowerupType.LIGHT) p.setLightSystem();
+		
+		return p;
 	}
 
 	public Platform getHead() {

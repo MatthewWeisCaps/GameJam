@@ -12,5 +12,5 @@ public class Mappers {
 	public static ComponentMapper<TextureComponent> textureMap = ComponentMapper.getFor(TextureComponent.class);
 	public static ComponentMapper<TransformComponent> transformMap = ComponentMapper.getFor(TransformComponent.class);
 	public static ComponentMapper<TypeComponent> typeMap = ComponentMapper.getFor(TypeComponent.class);
-
+	public static ComponentMapper<PowerupComponent> powerupMap = ComponentMapper.getFor(PowerupComponent.class);
 }

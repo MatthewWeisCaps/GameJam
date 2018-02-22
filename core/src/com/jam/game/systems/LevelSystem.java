@@ -17,10 +17,13 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
+import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
 import com.jam.game.levels.Platform;
+import com.jam.game.powerup.Powerup;
 import com.jam.game.screens.GameScreen;
+import com.jam.game.utils.Rando;
 
 import box2dLight.RayHandler;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
@@ -29,6 +32,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 public class LevelSystem extends EntitySystem {
 	
 	private static final TextureRegion PLATFORM_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
+	
 	RayHandler lightRayHandler;
 	
 	private float camSpeed = 1.60f;
@@ -36,6 +40,7 @@ public class LevelSystem extends EntitySystem {
 	private float camSpeedIncrease = 0.00001f;
 //	private final static float INTERVAL = 1.0f/15.0f;
 	private Level level;
+	
 	private OrthographicCamera cam;
 	private float yHeight = 0.0f;
 	
@@ -44,12 +49,12 @@ public class LevelSystem extends EntitySystem {
 	
 	// height y = ySpeedCoefficient*(total time passed) + ySpeedInitial
 	
+	private final float ITEM_CHANCE = 0.80f; //must be larger than
+	
 	public LevelSystem(OrthographicCamera cam, Body playerBody, Level level) {
 		super(Priority.PHYSICS.PRIORITY);
 		this.level = level;
 		this.cam = cam;
-		
-//		LevelSystem.PLATFORM_TEXTURE.getTexture().setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 	}
 	
 	Random random = new Random();
@@ -120,12 +125,40 @@ public class LevelSystem extends EntitySystem {
 				animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
 						new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
 				animC.currentAnimation = def;
-				
+								
 				entity.add(bodyC);
 				entity.add(animC);
 				entity.add(transC);
 				
 				engine.addEntity(entity);
+				
+				//Roll for powerups on the platform
+				if(Rando.getRandomNumber() > this.ITEM_CHANCE){
+					Entity powerUpEntity = engine.createEntity();
+		
+					BodyComponent bodyPUC = engine.createComponent(BodyComponent.class); // make components
+					AnimationComponent animPUC = engine.createComponent(AnimationComponent.class);
+					TransformComponent transPUC = engine.createComponent(TransformComponent.class);
+					PowerupComponent powerupPUC = engine.createComponent(PowerupComponent.class);
+					
+					Powerup p = this.level.spawnPowerUp(bodyC.b2dBody.getPosition().x, bodyC.b2dBody.getPosition().y, engine);
+					
+					bodyPUC.b2dBody = p.getBody();
+					bodyPUC.b2dBody.setUserData(powerUpEntity);
+					
+					animPUC.animations.put(def, Powerup.getAnimation(p.type));
+					animPUC.currentAnimation = def;
+					
+					powerupPUC.powerup = p;
+										
+					powerUpEntity.add(bodyPUC);
+					powerUpEntity.add(animPUC);
+					powerUpEntity.add(transPUC);
+					powerUpEntity.add(powerupPUC);
+					
+					engine.addEntity(powerUpEntity);
+					System.out.println("Added powerup!");
+				}
 				
 			}
 			

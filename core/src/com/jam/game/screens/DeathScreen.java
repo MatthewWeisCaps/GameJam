@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.Game;
+import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
@@ -47,9 +48,6 @@ public class DeathScreen implements Screen{
 		
 		animationRegion = getAnimationRegions();
 		sprite = new AnimatedSprite(animationRegion);
-		
-        resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
 	}
 
 	@Override
