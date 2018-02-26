@@ -10,31 +10,52 @@ import com.jam.game.utils.Mappers;
 public class PlayerSystem extends EntitySystem{
 	
 	private Entity player;
+	private PlayerComponent pc;
 	
 	public PlayerSystem(Entity player){
 		this.player = player;
+		this.pc = Mappers.playerMap.get(this.player);
 	}
 	
 	@Override
     public void update(float deltaTime) {
     	super.update(deltaTime);
 
-    	PlayerComponent pc = Mappers.playerMap.get(this.player);
     	StateComponent st = Mappers.stateMap.get(this.player);
     	
     	int state = st.get();
     	
     	if(state == StateComponent.STATE_MOVING || state == StateComponent.STATE_INAIR){
-    		pc.changeDist(pc.distSubValue);
+    		this.changeDist(this.pc.distSubValue);
     	}else if(state == StateComponent.STATE_NORMAL){
-    		pc.changeDist(pc.distAddValue);
+    		this.changeDist(this.pc.distAddValue);
     	}
     	
-    	if(pc.lightPowerupEnabled){
-    		pc.powerupTime -= pc.reduceTime;
-    		pc.tickLightPowerUp();
+//    	this.changeDist(this.pc.distSubValue);
+    	
+    	if(this.pc.lightPowerupEnabled){
+    		this.pc.powerupTime -= pc.reduceTime;
+    		this.tickLightPowerUp();
     	}
     	
     }
+	
+	public void changeDist(float amount) {
+		float dist = this.pc.getDist();
+		if(dist < this.pc.getMinDist()) this.pc.setDistToMin();
+		else if(dist > this.pc.getMaxDist()) this.pc.setDistToMax();
+		else this.pc.setDist(dist + amount);
+	}
+	
+	public void tickLightPowerUp(){
+		if(this.pc.powerupTime <= 0){
+			this.pc.powerupTime = 0;
+			this.pc.lightPowerupEnabled = false;
+			
+			return;
+		}
+		
+		this.changeDist(this.pc.powerupBonusValue);
+	}
 
 }

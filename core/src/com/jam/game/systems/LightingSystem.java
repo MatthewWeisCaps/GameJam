@@ -31,7 +31,7 @@ public class LightingSystem extends EntitySystem implements Disposable {
 		lightRayHandler = new RayHandler(world);
 		
 		light = new PointLight(lightRayHandler, 40 /* num rays */, new Color(1.0f, 1.0f, 1.0f, 0.8f) /* color */,
-				PlayerComponent.dist /* distance */, 0 /* x */, 0 /* y */);
+				Mappers.playerMap.get(this.player).getDist() /* distance */, 0 /* x */, 0 /* y */);
 		
 		light.attachToBody(Mappers.bodyMap.get(player).b2dBody); // attach to player
 		light.setXray(true);
@@ -41,7 +41,7 @@ public class LightingSystem extends EntitySystem implements Disposable {
 	public void update(float deltaTime) {
 		super.update(deltaTime);
 		lightRayHandler.setCombinedMatrix(camera);
-		light.setDistance(PlayerComponent.dist);
+		light.setDistance(Mappers.playerMap.get(this.player).getDist());
 		lightRayHandler.updateAndRender();
 	}
 

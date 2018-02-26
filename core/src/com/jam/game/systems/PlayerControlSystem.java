@@ -41,7 +41,7 @@ public class PlayerControlSystem extends IteratingSystem {
 	public static final float MAX_ROPE_LENGTH = 13.0f;
 	public static final float ROPE_CAST_TIME = 0.30f;
 	
-	public float MIN_ROPE_LENGTH = 3.0f;
+	public float MIN_ROPE_LENGTH = 5.0f;
 	public float ROPE_PULL_UP_SPEED = .15f;
 	
 	private final float swingForce = 30.0f;
@@ -66,7 +66,6 @@ public class PlayerControlSystem extends IteratingSystem {
 		StateComponent state = Mappers.stateMap.get(entity);
 		
 		AnimationComponent anim = Mappers.animationMap.get(entity);
-		PlayerComponent p = Mappers.playerMap.get(entity);
 		
 		body.b2dBody.setGravityScale(1);
 		
@@ -187,10 +186,12 @@ public class PlayerControlSystem extends IteratingSystem {
 			lastXDir = -1;
 			_physXDir = -1;
 			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+//			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else if(controller.right && !controller.left) {
 			lastXDir = 1;
 			_physXDir = 1;
 			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+//			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else {
 			_physXDir = 0;
 			body.b2dBody.setLinearVelocity(0.0f, body.b2dBody.getLinearVelocity().y);

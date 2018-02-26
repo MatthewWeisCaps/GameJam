@@ -22,8 +22,7 @@ public class Box2DContactListener implements ContactListener {
 	 */
 	
 	private World world;
-	private PhysicsSystem physicsSystem;
-	private PooledEngine engine;
+	private PhysicsSystem physicsSystem;;
 	
 	public Box2DContactListener(World world, PhysicsSystem physicsSystem) {
 		this.world = world;
@@ -43,14 +42,12 @@ public class Box2DContactListener implements ContactListener {
 				PlayerComponent pc = Mappers.playerMap.get(e2);
 				pc.enableLightPowerup();
 				
-				System.out.println("TOUCHED POWER UP");
 			}else if(Mappers.powerupMap.has(e2) && Mappers.playerMap.has(e1)){
 				EntityManager.remove(e2);
 				
 				PlayerComponent pc = Mappers.playerMap.get(e1);
 				pc.enableLightPowerup();
 				
-				System.out.println("TOUCHED POWER UP");
 			}
 		}
 		

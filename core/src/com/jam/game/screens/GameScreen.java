@@ -53,8 +53,8 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class GameScreen implements Screen {
 	
-	public static final int VIRTUAL_WIDTH = 480/10;//380/8;//480
-	public static final int VIRTUAL_HEIGHT = 800/10;//300/8; //320
+	public static final int VIRTUAL_WIDTH = 480/8;//480/10
+	public static final int VIRTUAL_HEIGHT = 800/10;//
 	public static final int UNIT = 2;
 	
 	private Game game;
@@ -188,7 +188,7 @@ public class GameScreen implements Screen {
 		
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
-		playerFixture.friction = 0.0f;
+		playerFixture.friction = 1.0f;
 		playerFixture.filter.categoryBits = Category.PLAYER.getValue();
 		playerFixture.filter.maskBits = Mask.PLAYER.getValue();
 		body.b2dBody.createFixture(playerFixture);
@@ -203,7 +203,6 @@ public class GameScreen implements Screen {
 		
 		anim.currentAnimation = PlayerAnims.WALK_RIGHT;
 		
-		player.changeDist(-40); //Adds cool effect on game start
 		entity.add(body);
 		entity.add(pos);
 		entity.add(anim);
@@ -331,7 +330,7 @@ public class GameScreen implements Screen {
 		
 		floorFixture.shape = boxShape;
 		floorFixture.restitution = 0.0f;
-		floorFixture.friction = 0.0f;
+		floorFixture.friction = 1.0f;
 		
 		body.b2dBody.createFixture(floorFixture);
 		

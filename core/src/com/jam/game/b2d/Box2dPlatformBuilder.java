@@ -142,7 +142,39 @@ public class Box2dPlatformBuilder implements Disposable {
 		builder.setBodyType(BodyType.StaticBody);
 		builder.setBodyPosition(0, 0);
 		builder.setDensity(1.0f);
-		builder.setFriction(0.0f);
+		builder.setFriction(1.0f);
+		builder.setRestitution(0.0f);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, height);
+		builder.setShape(shape);
+		
+		return builder;
+	}
+	
+	public static Box2dPlatformBuilder SLICK(float width, float height){
+		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
+		
+		builder.setBodyType(BodyType.StaticBody);
+		builder.setBodyPosition(0, 0);
+		builder.setDensity(1.0f);
+		builder.setFriction(0.05f);
+		builder.setRestitution(0.0f);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, height);
+		builder.setShape(shape);
+		
+		return builder;
+	}
+	
+	public static Box2dPlatformBuilder NUB(float width, float height) {
+		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
+		
+		builder.setBodyType(BodyType.StaticBody);
+		builder.setBodyPosition(0, 0);
+		builder.setDensity(1.0f);
+		builder.setFriction(1.0f);
 		builder.setRestitution(0.0f);
 		
 		PolygonShape shape = new PolygonShape();
@@ -153,13 +185,43 @@ public class Box2dPlatformBuilder implements Disposable {
 	}
 	
 	public static Box2dPlatformBuilder DEFAULT(Platform platform) {
-		Box2dPlatformBuilder builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
-		builder.setBodyPosition(platform.x, platform.y); 	
+		Box2dPlatformBuilder builder;
 		
 		Filter f = new Filter();
-		f.categoryBits = Category.WALL.getValue();
-		f.maskBits = Mask.WALL.getValue();
+		
+		switch(platform.getType()){
+			case OIL:
+				builder = Box2dPlatformBuilder.SLICK(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
+				break;
+			case DAMAGE:
+				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
+				break;
+			case MOVE:
+				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
+				break;
+			case NUB:
+				builder = Box2dPlatformBuilder.NUB(platform.width, platform.height);
+				f.categoryBits = Category.WALL_NUB.getValue();
+				f.maskBits = Mask.WALL_NUB.getValue();
+				break;
+			case DEFAULT:
+				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				break;
+			default:
+				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				break;
+		}
+		
 		builder.setFilter(f);
+		
+		builder.setBodyPosition(platform.x, platform.y); 	
+		
 		
 		return builder;
 	}
