@@ -175,7 +175,7 @@ public class LevelSystem extends EntitySystem {
 			PooledEngine engine = (PooledEngine)this.getEngine(); // ref engine
 			
 			
-			for (Platform plat : level.spawnNextWithStates(engine)) {
+			for (Platform plat : level.spawnNextWithRow(engine)) {
 				if(plat == null) continue;
 				
 				Entity entity = engine.createEntity(); // make entity

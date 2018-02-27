@@ -1,5 +1,7 @@
 package com.jam.game.levels;
 
+import java.util.Arrays;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -37,13 +39,13 @@ public class Level {
 	public float wallHeight = 10.0f;
 	private float wallWidth = 2.0f;
 	
-	private float maxPlatDistToSpawnNub = 25.0f;
-	private int maxNubs = 5;
 	private float nubSize = 0.5f;
 	
 	private float slickPlatformChance = 0.75f; // 25% chance
 	
-	private float chanceToSpawnDoublePlatform = 0.75f;
+//	private float chanceToSpawnDoublePlatform = 0.75f;
+
+	private int[] lastRow;
 	
 	private final float SCREEN_SEG = GameScreen.VIRTUAL_WIDTH/3;
 	
@@ -59,94 +61,70 @@ public class Level {
 		this.walls = new Entity[2];
 	}
 	
-	public Platform[] spawnNext2(PooledEngine engine) {
+	public Platform[] spawnNextWithRow(PooledEngine engine){
+		Platform[] platforms = new Platform[3];
 		
-		int spacers = Rando.getRandomBetweenInt(100); // 0 to 99
-		
+		float yPos, xPos, width;
 		float height = 0.5f;
 		
-			if (spacers < 100) { // 25% chance to have 2 platform
-			
-			float yPos = 2.0f;
-			Platform[] newPlatform = new Platform[2];
-			
-			int nubCount = 0;
-			
-			for (int i=0; i < newPlatform.length; i++) newPlatform[i] = new Platform();
-			
-			{
-				float xPos, width;
-				
-				xPos = randomFloatInRange(MIN_X, (GameScreen.VIRTUAL_WIDTH/2.5f));
-				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-				
-				if (queue.size > 0) {
-					yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
-				}
-				
-				if(Rando.getRandomNumber() <= this.slickPlatformChance){
-					newPlatform[0].set(xPos, yPos, width, height, PlatformType.OIL);
-				}else{
-					newPlatform[0].set(xPos, yPos, width, height); //Default Platform
-				}
-				
-				newPlatform[0].setSegment(this.getScreenSeg(xPos));
-				
-				Body body = Box2dPlatformBuilder.DEFAULT(newPlatform[0]).buildAndDispose(world); // add body to world and retrieve it
-				
-				newPlatform[0].setBody(body);
-				
-				queue.addFirst(newPlatform[0]);
-			}
-			
-			float spacer = randomFloatInRange(6.0f, 7.6f); //3.8 - 7.6
-			
-			{
-				float xPos, width;
-				
-				xPos = randomFloatInRange((GameScreen.VIRTUAL_WIDTH/2.0f)+spacer, GameScreen.VIRTUAL_WIDTH);
-				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-				
-				//Spawning into wall...thats no good
-				if(xPos + width > GameScreen.VIRTUAL_WIDTH){
-					xPos = GameScreen.VIRTUAL_WIDTH - width - MIN_X; //Make it so that it is always the mix dist away from the wall
-				}
-			
-				// use same yPos as last...
-				
-				newPlatform[1].set(xPos, yPos, width, height);
-				
-				Body body = Box2dPlatformBuilder.DEFAULT(newPlatform[1]).buildAndDispose(world); // add body to world and retrieve it
-				newPlatform[1].setBody(body);
-				
-				queue.addFirst(newPlatform[1]);
-			}
-			
-			float distBetween = newPlatform[1].x - (newPlatform[0].x);
-			
-			Platform[] potPlatforms = new Platform[3];
-			if(distBetween > this.maxPlatDistToSpawnNub && NUB_COUNT < this.maxNubs){
-				System.out.println("Spawning nub: " + nubCount);
-				potPlatforms[0] = newPlatform[0];
-				potPlatforms[1] = newPlatform[1];
-				
-				potPlatforms[2] = new Platform();
-				potPlatforms[2].set(distBetween, potPlatforms[0].y + MAX_Y_INC/2, nubSize, nubSize, PlatformType.NUB);
-				
-				Body body = Box2dPlatformBuilder.DEFAULT(potPlatforms[2]).build(world);
-				potPlatforms[2].setBody(body);
-				NUB_COUNT++;
-				
-				return potPlatforms;
-			}
-			return newPlatform;
-			//return new Body[] { newPlatform[0].getBody(), newPlatform[1].getBody() };
-			
-		} else { // 15% chance to have 3 spacers
-			// can't happen. want to do 3 spacer floor
-			return null;
+		yPos = 10.0f;
+		
+		int[] nextRowToSpawn;
+		
+		boolean firstRow = this.lastRow == null;
+		
+		if(firstRow){ //We must spawn the first row
+			this.lastRow = this.getPlatRowFromLast(true);
+			nextRowToSpawn = this.getPlatRowFromLast(false);
+		}else{
+			nextRowToSpawn = this.getPlatRowFromLast(false);
 		}
 		
+		if (queue.size > 0 && !firstRow) {
+			yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
+		}
+		
+		for(int i=0; i<this.lastRow.length; i++){
+			int val = this.lastRow[i];
+			
+			if(val == 0) continue;
+			
+			
+			//Nub:
+			if(val == 2){
+				platforms[i] = new Platform();
+				xPos = getNubPosBasedOnCurrentSeg(i);
+				platforms[i].set(xPos, yPos + MAX_Y_INC - MAX_Y_INC/3, nubSize, nubSize, PlatformType.NUB);
+				
+				Body nubbody = Box2dPlatformBuilder.DEFAULT(platforms[i]).build(world);
+				platforms[i].setBody(nubbody);
+			}else{
+				platforms[i] = new Platform();
+
+				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
+				
+				
+				xPos = getXPosBasedOnCurrentSeg(i, width);
+				
+				if(Rando.getRandomNumber() <= this.slickPlatformChance){
+					platforms[i].set(xPos, yPos, width, height, PlatformType.OIL);
+				}else{
+					platforms[i].set(xPos, yPos, width, height); //Default Platform
+				}
+				
+				platforms[i].setSegment(this.getScreenSeg(xPos));
+				
+				Body body = Box2dPlatformBuilder.DEFAULT(platforms[i]).buildAndDispose(world); // add body to world and retrieve it
+				
+				platforms[i].setBody(body);
+				
+				queue.addFirst(platforms[i]);
+			}
+		}
+		
+		this.lastRow = nextRowToSpawn;
+		
+		return platforms;
 	}
 	
 	public Platform[] spawnNextWithStates(PooledEngine engine) {
@@ -208,91 +186,6 @@ public class Level {
 		return platforms;
 	}
 	
-	//TODO: FIX CODE DUPE!
-	public Platform[] spawnNext(PooledEngine engine) {
-		Platform[] platforms = new Platform[3]; //Left, Right, Nub
-				
-		float height = 0.5f;
-
-		float yPos = 10.0f;
-		int lastSeg = -1;
-
-		
-		//Get the ypos of the highest platform
-		if (queue.size > 0) {
-			yPos = queue.first().y + randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC); //May need to change
-			lastSeg = queue.first().getSegment() - 1;
-		}
-		
-		
-//		float doubleYpos = lastSeg >= 0 ? yPos + (randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC) * 4.5f) : yPos;
-		
-		//First Platform:
-		platforms[0] = new Platform();
-		
-		float xPos, width;
-		
-		width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-		xPos = getXPosBasedOnLastSeg(lastSeg, width);
-		
-		if(Rando.getRandomNumber() <= this.slickPlatformChance){
-			platforms[0].set(xPos, yPos, width, height, PlatformType.OIL);
-		}else{
-			platforms[0].set(xPos, yPos, width, height); //Default Platform
-		}
-		
-		platforms[0].setSegment(this.getScreenSeg(xPos));
-		
-		Body body = Box2dPlatformBuilder.DEFAULT(platforms[0]).buildAndDispose(world); // add body to world and retrieve it
-		
-		platforms[0].setBody(body);
-		
-		queue.addFirst(platforms[0]);
-		
-		//NUB
-		boolean[] takenSeg = new boolean[3];
-		for(int i=1; i < takenSeg.length+1; i++){
-			takenSeg[i-1] = platforms[0].getSegment() == i || lastSeg == i;
-		}
-		
-		if(takenSeg[0] || takenSeg[2]){
-			System.out.println("MAKING NUB");
-			platforms[2] = new Platform();
-			xPos = randomFloatInRange(this.SCREEN_SEG + MIN_X, this.SCREEN_SEG*2 - MIN_X);
-			platforms[2].set(xPos, platforms[0].y + MAX_Y_INC, nubSize, nubSize, PlatformType.NUB);
-			
-			Body nubbody = Box2dPlatformBuilder.DEFAULT(platforms[2]).build(world);
-			platforms[2].setBody(nubbody);
-		}
-		
-		//SECOND PLATFORM
-		platforms[1] = new Platform();
-		
-		width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-		xPos = getXPosBasedOnLastSeg(platforms[0].getSegment() - 1, width);
-		
-		while(takenSeg[this.getScreenSeg(xPos) - 1]){
-			xPos = getXPosBasedOnLastSeg(platforms[0].getSegment() - 1, width);
-		}
-		
-		if(Rando.getRandomNumber() <= this.slickPlatformChance){
-			platforms[1].set(xPos, yPos, width, height, PlatformType.OIL);
-		}else{
-			platforms[1].set(xPos, yPos, width, height); //Default Platform
-		}
-		
-		platforms[1].setSegment(this.getScreenSeg(xPos));
-		
-		body = Box2dPlatformBuilder.DEFAULT(platforms[1]).buildAndDispose(world); // add body to world and retrieve it
-		
-		platforms[1].setBody(body);
-		
-		queue.addFirst(platforms[1]);
-		
-		return platforms;
-	}
-	
-	
 	public Powerup spawnPowerUp(float platformX, float platformY, PooledEngine engine){
 		Powerup p = new Powerup();
 		
@@ -327,6 +220,94 @@ public class Level {
 		walls[1].setBody(rBody);
 				
 		return new Body[] {walls[0].getBody(), walls[1].getBody()};
+	}
+	
+	private int[] getPlatRowFromLast(boolean isFirstRow){
+		int[] newRow = new int[]{0,0,0};
+		
+		boolean twoPlats = Rando.coinFlip();
+		
+		int index;
+		
+		//Step 1: if we are the first row, return one (or two) new platform positions to spawn
+		if(isFirstRow){
+			index = this.getValidIndex(newRow);
+			newRow[index] = 1;
+			
+			if(twoPlats){
+				index = this.getValidIndex(newRow);
+				newRow[index] = 1;
+			}
+			
+			return newRow;
+		}
+		
+		//Step 2:
+		index = this.getValidIndex(newRow);
+		newRow[index] = 1;
+		int dist = this.getDistanceBetweenPlatRows(this.lastRow, index);
+		
+		//If we spawn below, place nub next to the above row and try to place another plat
+		if(dist == 0){
+			//If we spawn the nub in the middle, make it a random side
+			if(index == 1){
+				
+				//If it has neighbors we dont need to care:
+				if(this.lastRow[0] != 0 || this.lastRow[2] != 0) return newRow;
+				
+				int newNubPos = Rando.coinFlip() ? index - 1 : index + 1;
+				newRow[newNubPos] = 1; //(Nub value...change to var later!)
+				//Try to spawn other plat
+				if(twoPlats){
+					index = this.getValidIndex(newRow);
+					newRow[index] = 1;
+				}
+			}else{ //Just spawn the nub to the right or left (depending on placement)
+				if(index == 0){
+					if(this.lastRow[1] != 0) return newRow;
+					newRow[index+1] = 1;
+				}
+				if(index == 2){
+					if(this.lastRow[1] != 0) return newRow;
+					newRow[index-1] = 1;
+				}
+			}
+		//If it is next to it, just spawn another platform on the current row randomly
+		}else if(dist == 1){
+			if(twoPlats){
+				index = this.getValidIndex(newRow);
+				newRow[index] = 1;
+			}
+		//If it is very large, we must spawn a new nub between (will always be the center)
+		}else if(dist > 1){
+			newRow[1] = 2;
+		}
+		return newRow;
+	}
+	
+	private int getDistanceBetweenPlatRows(int[] lastRow, int currentPlatPos){
+		int dist = -1;
+		
+		if(lastRow[currentPlatPos] == 1){
+			dist = 0;
+		}else if(currentPlatPos == 1){ //If we are in the middle, then we know that the dist is one (b/c one is not above)
+			dist = 1;
+		}else if((currentPlatPos > 1 && lastRow[currentPlatPos - 1] == 1) || (currentPlatPos == 0 && lastRow[currentPlatPos + 1] == 1)){
+			dist = 1;
+		}else if((currentPlatPos == 2 && this.lastRow[0] == 1) || (currentPlatPos == 0 && this.lastRow[2] == 1)){
+			dist = 2;
+		}
+		
+		return dist;
+	}
+	private int getValidIndex(int[] row){
+		int index = Rando.getRandomBetweenInt(row.length);
+		
+		while(row[index] != 0){
+			index = Rando.getRandomBetweenInt(row.length);
+		}
+		
+		return index;
 	}
 	
 	private float getXPosBasedOnLastSeg(int lastSeg, float width){

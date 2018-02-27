@@ -12,4 +12,8 @@ public class Rando {
 	public static int getRandomBetweenInt(int max){
 		return r.nextInt(max);
 	}
+	
+	public static boolean coinFlip(){
+		return Rando.getRandomNumber() > 0.5f;
+	}
 }
