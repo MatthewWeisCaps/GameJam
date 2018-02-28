@@ -24,8 +24,10 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.jam.game.Game;
 import com.jam.game.b2d.Box2DContactListener;
+import com.jam.game.b2d.Box2dPlatformBuilder;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
+import com.jam.game.components.PlatformComponent;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
 import com.jam.game.components.TransformComponent;
@@ -45,6 +47,7 @@ import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
+import com.jam.game.utils.enums.PlatformType;
 import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
@@ -178,6 +181,7 @@ public class GameScreen implements Screen {
 		BodyDef playerBodyDef = new BodyDef();
 		playerBodyDef.type = BodyDef.BodyType.DynamicBody;
 		playerBodyDef.position.set(VIRTUAL_WIDTH/2.0f, 4.0f);
+		playerBodyDef.fixedRotation = true;
 		
 		body.b2dBody = world.createBody(playerBodyDef);
 		FixtureDef playerFixture = new FixtureDef();
@@ -359,101 +363,82 @@ public class GameScreen implements Screen {
 		createRightWall();
 	}
 	
-	void createLeftWall() {
-		TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 6, 32);
-		
+	void createLeftWall() {		
 		Entity entity = engine.createEntity();
-		BodyComponent body = engine.createComponent(BodyComponent.class);
-		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
-		TransformComponent pos = engine.createComponent(TransformComponent.class);
-
-
-		BodyDef floorBodyDef = new BodyDef();
-		floorBodyDef.type = BodyDef.BodyType.StaticBody;
-		floorBodyDef.position.set(0,VIRTUAL_HEIGHT*2);
 		
-		body.b2dBody = world.createBody(floorBodyDef);
+		BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
+		AnimationComponent animC = engine.createComponent(AnimationComponent.class);
+		TransformComponent transC = engine.createComponent(TransformComponent.class);
+		PlatformComponent platC = engine.createComponent(PlatformComponent.class);
 		
-		FixtureDef floorFixture = new FixtureDef();
+		PlatformComponent pc = new PlatformComponent();
 		
-		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(UNIT, VIRTUAL_HEIGHT*2);
+		pc.set(0, 70, UNIT, 100);
 		
-		floorFixture.shape = boxShape;
-		floorFixture.restitution = 0.0f;
-		floorFixture.friction = 0.0f;
+		Body body = Box2dPlatformBuilder.DEFAULT(pc).buildAndDispose(world); // add body to world and retrieve it
+		pc.setBody(body);
 		
-		body.b2dBody.createFixture(floorFixture);
-		
-		pos.pos.set(128,32,0);
-		
+		bodyC.b2dBody = pc.getBody();
+		bodyC.b2dBody.setUserData(entity);
 		
 		Array<TextureRegion> one = new Array<TextureRegion>();
 		one.setSize(1);
-		one.set(0, WALL_TEXTURE);
+		one.set(0, pc.getTextureRegion());
 		
-		one.add(WALL_TEXTURE);
+		one.add(pc.getTextureRegion());
 		
 		final String def = "DEFAULT";
-		anim.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
 				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-		anim.currentAnimation = def;
+		animC.currentAnimation = def;
 		
-		entity.add(anim);
-		entity.add(body);
-		entity.add(pos);
+		platC = pc;
+		
+		entity.add(bodyC);
+		entity.add(animC);
+		entity.add(transC);
+		entity.add(platC);
 		
 		engine.addEntity(entity);
-		boxShape.dispose();
 	}
 	
 	void createRightWall() {
-		TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 6, 32);
-		//WALL_TEXTURE.flip(true, false);
-		
 		Entity entity = engine.createEntity();
-		BodyComponent body = engine.createComponent(BodyComponent.class);
-		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
-		TransformComponent pos = engine.createComponent(TransformComponent.class);
-
-
-		BodyDef floorBodyDef = new BodyDef();
-		floorBodyDef.type = BodyDef.BodyType.StaticBody;
-		floorBodyDef.position.set(VIRTUAL_WIDTH,VIRTUAL_HEIGHT*2);
 		
-		body.b2dBody = world.createBody(floorBodyDef);
+		BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
+		AnimationComponent animC = engine.createComponent(AnimationComponent.class);
+		TransformComponent transC = engine.createComponent(TransformComponent.class);
+		PlatformComponent platC = engine.createComponent(PlatformComponent.class);
 		
-		FixtureDef floorFixture = new FixtureDef();
+		PlatformComponent pc = new PlatformComponent();
 		
-		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(UNIT, VIRTUAL_HEIGHT*2);
+		pc.set(VIRTUAL_WIDTH, 70, UNIT, 100);
 		
-		floorFixture.shape = boxShape;
-		floorFixture.restitution = 0.0f;
-		floorFixture.friction = 0.0f;
+		Body body = Box2dPlatformBuilder.DEFAULT(pc).buildAndDispose(world); // add body to world and retrieve it
+		pc.setBody(body);
 		
-		body.b2dBody.createFixture(floorFixture);
-		
-		pos.pos.set(128,32,0);
-		
+		bodyC.b2dBody = pc.getBody();
+		bodyC.b2dBody.setUserData(entity);
 		
 		Array<TextureRegion> one = new Array<TextureRegion>();
 		one.setSize(1);
-		one.set(0, WALL_TEXTURE);
+		one.set(0, pc.getTextureRegion());
 		
-		one.add(WALL_TEXTURE);
+		one.add(pc.getTextureRegion());
 		
 		final String def = "DEFAULT";
-		anim.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
 				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-		anim.currentAnimation = def;
+		animC.currentAnimation = def;
 		
-		entity.add(anim);
-		entity.add(body);
-		entity.add(pos);
+		platC = pc;
+		
+		entity.add(bodyC);
+		entity.add(animC);
+		entity.add(transC);
+		entity.add(platC);
 		
 		engine.addEntity(entity);
-		boxShape.dispose();
 	}
 	
 

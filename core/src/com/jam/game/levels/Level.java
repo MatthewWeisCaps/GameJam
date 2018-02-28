@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Queue;
 import com.jam.game.b2d.Box2dPlatformBuilder;
+import com.jam.game.components.PlatformComponent;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Rando;
@@ -41,7 +42,7 @@ public class Level {
 	
 	private float nubSize = 0.5f;
 	
-	private float slickPlatformChance = 0.75f; // 25% chance
+	private float slickPlatformChance = 0.5f; // 25% chance
 	
 //	private float chanceToSpawnDoublePlatform = 0.75f;
 
@@ -50,19 +51,19 @@ public class Level {
 	private final float SCREEN_SEG = GameScreen.VIRTUAL_WIDTH/3;
 	
 	private StateMachine sm;
-	private Queue<Platform> queue;
+	private Queue<PlatformComponent> queue;
 	private World world;
 	
 	public Level(World world) {
-		this.queue = new Queue<Platform>();
+		this.queue = new Queue<PlatformComponent>();
 		this.world = world;
 		this.sm = new StateMachine();
 	
 		this.walls = new Entity[2];
 	}
 	
-	public Platform[] spawnNextWithRow(PooledEngine engine){
-		Platform[] platforms = new Platform[3];
+	public PlatformComponent[] spawnNextWithRow(PooledEngine engine){
+		PlatformComponent[] platforms = new PlatformComponent[3];
 		
 		float yPos, xPos, width;
 		float height = 0.5f;
@@ -92,14 +93,14 @@ public class Level {
 			
 			//Nub:
 			if(val == 2){
-				platforms[i] = new Platform();
+				platforms[i] = new PlatformComponent();
 				xPos = getNubPosBasedOnCurrentSeg(i);
 				platforms[i].set(xPos, yPos + MAX_Y_INC - MAX_Y_INC/3, nubSize, nubSize, PlatformType.NUB);
 				
 				Body nubbody = Box2dPlatformBuilder.DEFAULT(platforms[i]).build(world);
 				platforms[i].setBody(nubbody);
 			}else{
-				platforms[i] = new Platform();
+				platforms[i] = new PlatformComponent();
 
 				width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
 				
@@ -107,7 +108,7 @@ public class Level {
 				xPos = getXPosBasedOnCurrentSeg(i, width);
 				
 				if(Rando.getRandomNumber() <= this.slickPlatformChance){
-					platforms[i].set(xPos, yPos, width, height, PlatformType.OIL);
+					platforms[i].set(xPos, yPos, width, height, PlatformType.MOVE);
 				}else{
 					platforms[i].set(xPos, yPos, width, height); //Default Platform
 				}
@@ -124,65 +125,6 @@ public class Level {
 		
 		this.lastRow = nextRowToSpawn;
 		
-		return platforms;
-	}
-	
-	public Platform[] spawnNextWithStates(PooledEngine engine) {
-		Platform[] platforms = new Platform[4];
-		
-		int[][] currentStateValues = this.sm.moveToNextStateAndReturn();
-		
-		int onPlat = 0;
-		float yPos, xPos, width;
-		float height = 0.5f;
-		
-		yPos = 10.0f;//randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
-		
-		if (queue.size > 0) {
-			yPos = queue.first().y; //+ randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC);
-		}
-		
-		System.out.println("ON STATE: " + this.sm.current_state);
-		
-		for(int i=currentStateValues.length-1; i>=0; i--){
-			yPos += randomFloatInRange(Level.MIN_Y_INC, Level.MAX_Y_INC) * ((currentStateValues.length-1) - i);
-			for(int j=0; j<currentStateValues[i].length; j++){
-				int val = currentStateValues[i][j];
-				if(val == 0) continue;
-				
-				if(val == 2){
-					platforms[onPlat] = new Platform();
-					xPos = getNubPosBasedOnCurrentSeg(j);
-					platforms[onPlat].set(xPos, yPos - MAX_Y_INC/3, nubSize, nubSize, PlatformType.NUB);
-					
-					Body nubbody = Box2dPlatformBuilder.DEFAULT(platforms[onPlat]).build(world);
-					platforms[onPlat].setBody(nubbody);
-				}else{
-					platforms[onPlat] = new Platform();
-
-					width = randomFloatInRange(Level.MIN_WIDTH, Level.MAX_WIDTH);
-					
-					
-					xPos = getXPosBasedOnCurrentSeg(j, width);
-					
-					if(Rando.getRandomNumber() <= this.slickPlatformChance){
-						platforms[onPlat].set(xPos, yPos, width, height, PlatformType.OIL);
-					}else{
-						platforms[onPlat].set(xPos, yPos, width, height); //Default Platform
-					}
-					
-					platforms[onPlat].setSegment(this.getScreenSeg(xPos));
-					
-					Body body = Box2dPlatformBuilder.DEFAULT(platforms[onPlat]).buildAndDispose(world); // add body to world and retrieve it
-					
-					platforms[onPlat].setBody(body);
-					
-					queue.addFirst(platforms[onPlat]);
-				}
-				onPlat++;
-			}
-		}
-
 		return platforms;
 	}
 	
@@ -205,16 +147,16 @@ public class Level {
 	}
 	
 	public Body[] spawnLeftAndRightWalls(float y){
-		Platform[] walls = new Platform[2];
+		PlatformComponent[] walls = new PlatformComponent[2];
 		
 		//Left Wall:
-		walls[0] = new Platform();
+		walls[0] = new PlatformComponent();
 		walls[0].set(0, y, this.wallWidth, this.wallHeight);		
 		Body lBody = Box2dPlatformBuilder.DEFAULT(walls[0]).buildAndDispose(world); // add body to world and retrieve it
 		walls[0].setBody(lBody);
 		
 		//Right Wall:
-		walls[1] = new Platform();
+		walls[1] = new PlatformComponent();
 		walls[1].set(GameScreen.VIRTUAL_WIDTH, y, this.wallWidth, this.wallHeight);		
 		Body rBody = Box2dPlatformBuilder.DEFAULT(walls[1]).buildAndDispose(world); // add body to world and retrieve it
 		walls[1].setBody(rBody);
@@ -359,7 +301,7 @@ public class Level {
 		return seg;
 	}
 
-	public Platform getHead() {
+	public PlatformComponent getHead() {
 		
 		if (queue.size == 0) {
 			return null;
@@ -368,7 +310,7 @@ public class Level {
 		return queue.first();
 	}
 	
-	public Platform getTail() {
+	public PlatformComponent getTail() {
 		
 		if (queue.size == 0) {
 			return null;
@@ -377,7 +319,7 @@ public class Level {
 		return queue.last();
 	}
 	
-	public Platform getAndRemoveHead() {
+	public PlatformComponent getAndRemoveHead() {
 		
 		if (queue.size == 0) {
 			return null;
@@ -387,7 +329,7 @@ public class Level {
 		return queue.removeFirst();
 	}
 	
-	public Platform getAndRemoveTail() {
+	public PlatformComponent getAndRemoveTail() {
 		
 		if (queue.size == 0) {
 			return null;
@@ -402,7 +344,7 @@ public class Level {
 		return (Rando.getRandomNumber() * (end - start))+start;
 	}
 	
-	public Queue<Platform> getPlatformQueue() {
+	public Queue<PlatformComponent> getPlatformQueue() {
 		return queue;
 	}
 	

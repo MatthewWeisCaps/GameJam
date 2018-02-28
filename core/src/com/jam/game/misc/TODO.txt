@@ -29,7 +29,7 @@ MECHS:
 		-Increase jump
 		-Increase speed
 		
-	3) Nub joints to swing on
+	3) Nub joints to swing on **DONE**
 	
 	4) Platform types:(Slowly introduce new platforms)
 		-Conveyor belt platforms 

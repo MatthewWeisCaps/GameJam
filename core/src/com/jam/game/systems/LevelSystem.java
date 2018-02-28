@@ -9,16 +9,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.components.AnimationComponent;
 import com.jam.game.components.BodyComponent;
+import com.jam.game.components.PlatformComponent;
 import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
-import com.jam.game.levels.Platform;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Mappers;
@@ -148,17 +149,14 @@ public class LevelSystem extends EntitySystem {
 		
 		/*!cam.frustum.pointInFrustum(platform.getBody().getLocalCenter().x, platform.getBody().getLocalCenter().y, 0.0f) */
 		// check lowest platform for removal, if so remove its body and entity from engine and world
-		Platform platform = level.getTail();
+		PlatformComponent platform = level.getTail();
 		if (platform != null && platform.getBody() != null && platform.getBody().getUserData() != null) {
 			
 			FitViewport viewport = this.getEngine().getSystem(RenderingSystem.class).getViewport();
 			Camera cam = viewport.getCamera();
 			cam.update();
 			Vector3 coords3D = cam.project(new Vector3(platform.getBody().getPosition(), 0.0f), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
-			
-			
-
-			
+				
 			if (coords3D.y < -5.0f) {
 									
 				Entity entity = (Entity) platform.getBody().getUserData();
@@ -170,12 +168,26 @@ public class LevelSystem extends EntitySystem {
 			}
 		}
 		
+		for(int i=0; i<level.getPlatformQueue().size; i++){
+			PlatformComponent pc = level.getPlatformQueue().get(i);
+			
+			if(pc.getType() == PlatformType.MOVE){
+
+				Body body = pc.getBody();
+				
+				body.setGravityScale(0);
+				body.setLinearVelocity(new Vector2(0,0));
+				body.setLinearVelocity(pc.getDir() * pc.SPEED, Math.abs(body.getLinearVelocity().y));
+
+			}
+		}
+		
 		// check if new platform needs to be spawned
 		while (level.getPlatformQueue().size < 30) {
 			PooledEngine engine = (PooledEngine)this.getEngine(); // ref engine
 			
 			
-			for (Platform plat : level.spawnNextWithRow(engine)) {
+			for (PlatformComponent plat : level.spawnNextWithRow(engine)) {
 				if(plat == null) continue;
 				
 				Entity entity = engine.createEntity(); // make entity
@@ -183,6 +195,7 @@ public class LevelSystem extends EntitySystem {
 				BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
 				AnimationComponent animC = engine.createComponent(AnimationComponent.class);
 				TransformComponent transC = engine.createComponent(TransformComponent.class);
+				PlatformComponent platC = engine.createComponent(PlatformComponent.class);
 				
 				bodyC.b2dBody = plat.getBody();
 				bodyC.b2dBody.setUserData(entity);
@@ -197,13 +210,16 @@ public class LevelSystem extends EntitySystem {
 				animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
 						new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
 				animC.currentAnimation = def;
-								
+				
+				platC = plat;
+				
 				entity.add(bodyC);
 				entity.add(animC);
 				entity.add(transC);
+				entity.add(platC);
 				
 				engine.addEntity(entity);
-				
+								
 				//Roll for powerups on the platform
 				if(Rando.getRandomNumber() > this.ITEM_CHANCE && plat.getType() != PlatformType.NUB){
 					Entity powerUpEntity = engine.createEntity();
@@ -249,6 +265,10 @@ public class LevelSystem extends EntitySystem {
 		
 		if(camSpeed > camSpeedMax) camSpeed = camSpeedMax;
 		
+		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
+	}
+	
+	private float calculateXPos(){
 		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
 	}
 }

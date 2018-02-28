@@ -168,15 +168,14 @@ public class PlayerControlSystem extends IteratingSystem {
 			body.b2dBody.setGravityScale(3); // MATT: changed from 2 -> 4
 		}
 		
-		
-		if(Math.abs(body.b2dBody.getLinearVelocity().y) <= 0.0000000000005f) { // instead of comparing to 0, allow small room for error
+		if(Math.abs(body.b2dBody.getLinearVelocity().y) <= 0.00005f) { // instead of comparing to 0, allow small room for error
 			jumpCount = 0;
 			if(state.get() == StateComponent.STATE_INAIR) {
 				state.set(StateComponent.STATE_NORMAL);
 			}
-			if(body.b2dBody.getLinearVelocity().x != 0) {
+			if(Math.abs(body.b2dBody.getLinearVelocity().x) > 5) {
 				state.set(StateComponent.STATE_MOVING);
-			}else if(body.b2dBody.getLinearVelocity().x == 0 && body.b2dBody.getLinearVelocity().y == 0){
+			}else if(Math.abs(body.b2dBody.getLinearVelocity().x) <= 5 && Math.abs(body.b2dBody.getLinearVelocity().y) <= 0.00005f){
 				state.set(StateComponent.STATE_NORMAL);
 			}
 		}

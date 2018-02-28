@@ -10,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
-import com.jam.game.levels.Platform;
+import com.jam.game.components.PlatformComponent;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
@@ -101,6 +101,11 @@ public class Box2dPlatformBuilder implements Disposable {
 		return this;
 	}
 	
+	public Box2dPlatformBuilder setGravity() {
+		b2dBody.setFixedRotation(true);
+		return this;
+	}
+	
 	/*
 	 * Build method. Disposes of shape, not body.
 	 */
@@ -124,6 +129,7 @@ public class Box2dPlatformBuilder implements Disposable {
 	public Body build(World world) {
 		b2dBody = world.createBody(b2dBodyDef);
 		b2dBody.createFixture(b2dFixture);
+		
 		return b2dBody;
 	}
 	
@@ -168,6 +174,22 @@ public class Box2dPlatformBuilder implements Disposable {
 		return builder;
 	}
 	
+	public static Box2dPlatformBuilder MOVING(float width, float height){
+		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
+		
+		builder.setBodyType(BodyType.DynamicBody);
+		builder.setBodyPosition(0, 0);
+		builder.setDensity(9999.0f);
+		builder.setFriction(1.0f);
+		builder.setRestitution(0.0f);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, height);
+		builder.setShape(shape);
+			
+		return builder;
+	}
+	
 	public static Box2dPlatformBuilder NUB(float width, float height) {
 		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
 		
@@ -184,7 +206,7 @@ public class Box2dPlatformBuilder implements Disposable {
 		return builder;
 	}
 	
-	public static Box2dPlatformBuilder DEFAULT(Platform platform) {
+	public static Box2dPlatformBuilder DEFAULT(PlatformComponent platform) {
 		Box2dPlatformBuilder builder;
 		
 		Filter f = new Filter();
@@ -201,7 +223,7 @@ public class Box2dPlatformBuilder implements Disposable {
 				f.maskBits = Mask.WALL.getValue();
 				break;
 			case MOVE:
-				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				builder = Box2dPlatformBuilder.MOVING(platform.width, platform.height);
 				f.categoryBits = Category.WALL.getValue();
 				f.maskBits = Mask.WALL.getValue();
 				break;
@@ -212,6 +234,8 @@ public class Box2dPlatformBuilder implements Disposable {
 				break;
 			case DEFAULT:
 				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
 				break;
 			default:
 				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);

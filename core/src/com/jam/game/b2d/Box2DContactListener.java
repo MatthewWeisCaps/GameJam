@@ -8,11 +8,14 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.JointEdge;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
+import com.jam.game.components.BodyComponent;
+import com.jam.game.components.PlatformComponent;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
+import com.jam.game.utils.enums.PlatformType;
 
 public class Box2DContactListener implements ContactListener {
 
@@ -48,6 +51,38 @@ public class Box2DContactListener implements ContactListener {
 				PlayerComponent pc = Mappers.playerMap.get(e1);
 				pc.enableLightPowerup();
 				
+			}else if(Mappers.platformMap.has(e1) && Mappers.platformMap.has(e2)){
+				PlatformComponent pc1 = Mappers.platformMap.get(e1);
+				PlatformComponent pc2 = Mappers.platformMap.get(e2);
+				
+				pc1.changeDir();
+				pc2.changeDir();
+//			}else if(Mappers.playerMap.has(e1) && Mappers.platformMap.has(e2)){
+//				PlayerComponent player = Mappers.playerMap.get(e1);
+//				PlatformComponent plat = Mappers.platformMap.get(e2);
+//				
+//				if(plat.getType() == PlatformType.MOVE){
+//					BodyComponent body = Mappers.bodyMap.get(e1);
+//					System.out.println(body.b2dBody.getLinearVelocity());
+//	
+//					body.b2dBody.setLinearVelocity(0, 0);
+//					System.out.println(body.b2dBody.getLinearVelocity());
+//				}
+//
+//
+//			}
+//			else if(Mappers.playerMap.has(e2) && Mappers.platformMap.has(e1)){
+//				PlayerComponent pc1 = Mappers.playerMap.get(e2);
+//				PlatformComponent plat = Mappers.platformMap.get(e2);
+//				
+//				if(plat.getType() == PlatformType.MOVE){
+//					BodyComponent body = Mappers.bodyMap.get(e2);
+//					System.out.println(body.b2dBody.getLinearVelocity());
+//					body.b2dBody.setLinearVelocity(0, 0);
+//					System.out.println(body.b2dBody.getLinearVelocity());
+//				}
+
+
 			}
 		}
 		
@@ -73,10 +108,8 @@ public class Box2DContactListener implements ContactListener {
 			if (state.isSwinging) {
 				
 				if (state.ropeJoint != null) {
-					System.out.println("end 1");
 					physicsSystem.safelyMarkJointForDestruction(state);
 				} else {
-					System.out.println("end 2");
 					state.isSwinging = false;
 				}
 			}

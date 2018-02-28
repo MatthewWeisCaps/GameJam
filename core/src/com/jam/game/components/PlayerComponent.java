@@ -2,9 +2,12 @@ package com.jam.game.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.jam.game.controllers.KeyboardController;
 
 public class PlayerComponent implements Component, Poolable {
 
+	public KeyboardController controller = new KeyboardController();
+	
 	private final float MIN_DIST = 10;
 	private final float MAX_DIST = 75; //Was 100
 	
@@ -17,6 +20,8 @@ public class PlayerComponent implements Component, Poolable {
 	public float distSubValue = -0.1f; //was -0.05
 	public float distAddValue = 0.30f; //was .40
 	public float dist = 40.0f;
+	
+	public boolean onMovingPlatform = false;
 	
 	public void enableLightPowerup(){
 		powerupTime = max_powerupTime;

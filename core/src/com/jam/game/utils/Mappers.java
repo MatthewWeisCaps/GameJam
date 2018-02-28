@@ -13,4 +13,5 @@ public class Mappers {
 	public static ComponentMapper<TransformComponent> transformMap = ComponentMapper.getFor(TransformComponent.class);
 	public static ComponentMapper<TypeComponent> typeMap = ComponentMapper.getFor(TypeComponent.class);
 	public static ComponentMapper<PowerupComponent> powerupMap = ComponentMapper.getFor(PowerupComponent.class);
+	public static ComponentMapper<PlatformComponent> platformMap = ComponentMapper.getFor(PlatformComponent.class);
 }
