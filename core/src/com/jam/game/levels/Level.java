@@ -42,7 +42,7 @@ public class Level {
 	
 	private float nubSize = 0.5f;
 	
-	private float slickPlatformChance = 0.5f; // 25% chance
+	private float slickPlatformChance = 0.15f; // 25% chance
 	
 //	private float chanceToSpawnDoublePlatform = 0.75f;
 

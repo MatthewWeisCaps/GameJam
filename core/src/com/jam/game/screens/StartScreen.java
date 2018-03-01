@@ -26,6 +26,7 @@ public class StartScreen implements Screen{
 	public final static int VIRTUAL_HEIGHT = 32;
 	
 	private Music music;
+	private Music soundEfct;
 	
 	OrthographicCamera camera;
     FitViewport viewport;
@@ -42,6 +43,9 @@ public class StartScreen implements Screen{
 	@Override
 	public void show() {
 		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
+		
+		soundEfct = Gdx.audio.newMusic(Gdx.files.internal("start_sound.mp3"));
+		soundEfct.setVolume(soundEfct.getVolume()/2);
 		
 		music.setVolume(music.getVolume()/3);
 		music.play();
@@ -68,10 +72,12 @@ public class StartScreen implements Screen{
 		
 		if (sprite.isAnimationFinished()) {
 			if(onScreen == 0){
-				sprite = new AnimatedSprite(animationRegions.get(++onScreen));
+				sprite = new AnimatedSprite(animationRegions.	get(++onScreen));
 			} else if(onScreen == 1){
 				if(Gdx.input.isKeyJustPressed(Keys.ENTER)){
 					sprite = new AnimatedSprite(animationRegions.get(++onScreen));
+					music.setVolume(music.getVolume()/2);
+					soundEfct.play();
 				}
 			}else if(onScreen >= 2){
 				music.pause();
@@ -141,6 +147,7 @@ public class StartScreen implements Screen{
 	public void dispose() {
 		batch.dispose();
 		music.dispose();
+		soundEfct.dispose();
 	}
 
 }
