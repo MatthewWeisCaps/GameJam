@@ -1,6 +1,7 @@
 package com.jam.game.powerup;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -17,6 +18,8 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class Powerup implements Component, Poolable {
+	private final static Texture texture = new Texture(Gdx.files.internal("powerups_ALL.png"));
+	
 	public float x, y, width, height;
 	public PowerupType type;
 	public PointLight light;
@@ -65,6 +68,7 @@ public class Powerup implements Component, Poolable {
 	}
 	
 	public void removeLightSystem(){
+		if(this.type != PowerupType.LIGHT) return; //Can't remove a light from something that doesn't have one!
 		this.light.remove();
 	}
 	
@@ -82,8 +86,17 @@ public class Powerup implements Component, Poolable {
 		Array<TextureRegion> regions = new Array<TextureRegion>(20);
 		regions.setSize(20);
 		
-		for(int i=0; i<20; i++){
-			regions.set(i, new TextureRegion(new Texture("helmet.png"), i*32, 0, 32, 32));
+		int count = 0;
+		for(int i=0; i<=3; i++){
+			for(int j=0; j<6; j++){
+				
+				if(i == 3 && j >= 2){
+					break;
+				}
+				
+				regions.set(count, new TextureRegion(texture, j*32, i*32, 32, 32));
+				count++;
+			}
 		}
 		AnimatedBox2DSprite spin = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 			
@@ -99,18 +112,22 @@ public class Powerup implements Component, Poolable {
 		Array<TextureRegion> regions = new Array<TextureRegion>(16);
 		regions.setSize(16);
 		
-		for(int i=0; i<16; i++){
-			regions.set(i, new TextureRegion(new Texture("light.png"), i*16, 0, 16, 16));
+		int count = 0;
+		for(int i=4; i<=6; i++){
+			for(int j=0; j<6; j++){
+				
+				if(i == 6 && j >= 4){
+					break;
+				}
+				regions.set(count, new TextureRegion(texture, j*32, i*32, 32, 32));
+				count++;
+			}
 		}
 		AnimatedBox2DSprite spin = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
-			
-		/*spin.setUseOrigin(false);
-		spin.setScale(2.5f);
-		spin.setPosition(0, 2f);*/
-	
+				
 		spin.setUseOrigin(false);
-		spin.setScale(1.5f);
-		spin.setPosition(0, 1f);
+		spin.setScale(2.5f);
+		spin.setPosition(0, 1.5f);
 		
 		return spin;
 	}

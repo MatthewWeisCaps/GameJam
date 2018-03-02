@@ -10,15 +10,16 @@ import com.jam.game.utils.enums.PlatformType;
 
 public class PlatformComponent implements Component, Poolable{
 	
+	private final float OIL_CHANCE = 0.25f;
+	private final float MOVING_CHANCE = 0.50f;
+	
 	public float x, y, width, height;
 	private Body body; // body associated w/ this platform
 	
 	private int dir = 0; //Used only for moving platforms
 	public final float SPEED = 2.0f;
 	private PlatformType type;
-	
-	private int screenSegment;
-	
+		
 	public PlatformComponent() {
 		this(0.0f, 0.0f, 0.0f, 0.0f);
 	}
@@ -67,17 +68,7 @@ public class PlatformComponent implements Component, Poolable{
 		this.body.setFixedRotation(true);
 	}
 	
-	public void setSegment(int seg){
-		this.screenSegment = seg;
-	}
-	
-	public int getSegment(){
-		return this.screenSegment;
-	}
-	
-	public void changeDir(){
-//		if(this.dir == 0) return;
-		
+	public void changeDir(){		
 		this.dir = (-1) * this.dir;
 	}
 	
@@ -98,6 +89,20 @@ public class PlatformComponent implements Component, Poolable{
 		return this.type.getTextureRegion();
 	}
 
+	public PlatformType rollForPlatformType(){
+		PlatformType type = PlatformType.DEFAULT;
+		
+		if(Rando.coinFlip()){ //50% chance to roll for moving
+			if(Rando.getRandomNumber() <= OIL_CHANCE){
+				type = PlatformType.OIL;
+			}
+		}else{
+			if(Rando.getRandomNumber() <= MOVING_CHANCE){
+				type = PlatformType.MOVE;
+			}
+		}
+		return type;
+	}
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub

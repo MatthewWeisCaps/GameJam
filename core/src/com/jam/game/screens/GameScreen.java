@@ -65,6 +65,7 @@ public class GameScreen implements Screen {
 	public boolean playerDeath = false;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png");
+	public final static Texture PLATFORM_TEXTURE = new Texture("platforms_ALL.png");
 	
 	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("gameplay_music.mp3"));
 	
@@ -112,7 +113,7 @@ public class GameScreen implements Screen {
 		player = createPlayer();
 		createFloor();
 
-		world.setContactListener(new Box2DContactListener(world, engine.getSystem(PhysicsSystem.class)));
+		world.setContactListener(new Box2DContactListener(engine.getSystem(PhysicsSystem.class)));
 		
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		engine.addSystem(new LightingSystem(player, world, camera));

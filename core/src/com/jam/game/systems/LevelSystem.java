@@ -21,8 +21,6 @@ import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
 import com.jam.game.powerup.Powerup;
-import com.jam.game.screens.GameScreen;
-import com.jam.game.utils.Mappers;
 import com.jam.game.utils.Rando;
 import com.jam.game.utils.enums.PlatformType;
 
@@ -30,10 +28,7 @@ import box2dLight.RayHandler;
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
-public class LevelSystem extends EntitySystem {
-	
-	//private static final TextureRegion PLATFORM_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
-	
+public class LevelSystem extends EntitySystem {	
 	RayHandler lightRayHandler;
 	
 	private float camSpeed = 1.60f;
@@ -56,89 +51,6 @@ public class LevelSystem extends EntitySystem {
 	@Override
 	public void update(float deltaTime) {
 		super.update(deltaTime);
-		
-//		if(this.level.walls[0] != null && this.level.walls[1] != null){
-//			FitViewport viewport = this.getEngine().getSystem(RenderingSystem.class).getViewport();
-//
-//			Body lb = Mappers.bodyMap.get(this.level.walls[0]).b2dBody;
-//			Body rb = Mappers.bodyMap.get(this.level.walls[1]).b2dBody;
-//			
-//			Vector3 coords3D = cam.project(new Vector3(lb.getPosition(), 0.0f), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
-//			
-//			
-//			if(coords3D.y < this.level.wallHeight/2 && coords3D.y > -this.level.wallHeight){
-//				this.level.spawnLeftAndRightWalls(lb.getPosition().y + this.level.wallHeight);
-//				System.out.println("Smaller than half height and higher than screen");
-//			}else{
-//				this.getEngine().removeEntity(lb.getUserData());
-//				this.getEngine().removeEntity(rb.getUserData());
-//				
-//				this.level.spawnLeftAndRightWalls(lb.getPosition().y + this.level.wallHeight);
-//
-//			}
-//		}else{ //INIT THE SIDE WALLS
-//			System.out.println("Spawning walls");
-//			PooledEngine engine = (PooledEngine)this.getEngine(); // ref engine
-//			
-//			Body[] bodies = this.level.spawnLeftAndRightWalls(this.level.wallHeight);
-//			
-//			//Left Wall:
-//			Entity lentity = engine.createEntity(); // make entity
-//			
-//			BodyComponent lbodyC = engine.createComponent(BodyComponent.class); // make components
-//			AnimationComponent lanimC = engine.createComponent(AnimationComponent.class);
-//			TransformComponent ltransC = engine.createComponent(TransformComponent.class);
-//			
-//			lbodyC.b2dBody = bodies[0];
-//			lbodyC.b2dBody.setUserData(lentity);
-//			
-//			Array<TextureRegion> lone = new Array<TextureRegion>();
-//			lone.setSize(1);
-//			lone.set(0, PLATFORM_TEXTURE);
-//			
-//			lone.add(LevelSystem.PLATFORM_TEXTURE);
-//			
-//			final String def = "DEFAULT";
-//			lanimC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-//					new Animation<TextureRegion>(0.0f, lone, PlayMode.NORMAL))));
-//			lanimC.currentAnimation = def;
-//							
-//			lentity.add(lbodyC);
-//			lentity.add(lanimC);
-//			lentity.add(ltransC);
-//			
-//			engine.addEntity(lentity);
-//			
-//			//Right Wall:
-//			Entity rentity = engine.createEntity(); // make entity
-//			
-//			BodyComponent rbodyC = engine.createComponent(BodyComponent.class); // make components
-//			AnimationComponent ranimC = engine.createComponent(AnimationComponent.class);
-//			TransformComponent rtransC = engine.createComponent(TransformComponent.class);
-//			
-//			rbodyC.b2dBody = bodies[1];
-//			rbodyC.b2dBody.setUserData(rentity);
-//			
-//			Array<TextureRegion> rone = new Array<TextureRegion>();
-//			rone.setSize(1);
-//			rone.set(0, PLATFORM_TEXTURE);
-//			
-//			rone.add(LevelSystem.PLATFORM_TEXTURE);
-//			
-//			final String rdef = "DEFAULT";
-//			ranimC.animations.put(rdef, new AnimatedBox2DSprite(new AnimatedSprite(
-//					new Animation<TextureRegion>(0.0f, rone, PlayMode.NORMAL))));
-//			ranimC.currentAnimation = rdef;
-//							
-//			rentity.add(rbodyC);
-//			rentity.add(ranimC);
-//			rentity.add(rtransC);
-//			
-//			engine.addEntity(rentity);
-//			
-//			this.level.walls[0] = lentity;
-//			this.level.walls[1] = rentity;
-//		}
 		
 		// calc new y
 		yHeight = calculateYHeight();//Math.max(calculateYHeight(), playerBody.getPosition().y);
@@ -200,15 +112,21 @@ public class LevelSystem extends EntitySystem {
 				bodyC.b2dBody = plat.getBody();
 				bodyC.b2dBody.setUserData(entity);
 				
-				Array<TextureRegion> one = new Array<TextureRegion>();
-				one.setSize(1);
-				one.set(0, plat.getTextureRegion());
-				
-				one.add(plat.getTextureRegion());
-				
 				final String def = "DEFAULT";
-				animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-						new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+				
+				if(plat.getType() != PlatformType.NUB){
+					Array<TextureRegion> one = new Array<TextureRegion>();
+					one.setSize(1);
+					one.set(0, plat.getTextureRegion());
+					
+					one.add(plat.getTextureRegion());
+					
+					animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+							new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+				}else{
+					animC.animations.put(def, PlatformType.NUB.getNubAnimation());
+				}
+				
 				animC.currentAnimation = def;
 				
 				platC = plat;
@@ -265,10 +183,6 @@ public class LevelSystem extends EntitySystem {
 		
 		if(camSpeed > camSpeedMax) camSpeed = camSpeedMax;
 		
-		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
-	}
-	
-	private float calculateXPos(){
 		return camSpeed * (float)Math.pow(GdxAI.getTimepiece().getTime(), 1.14f);
 	}
 }

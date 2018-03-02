@@ -1,7 +1,5 @@
 package com.jam.game.levels;
 
-import java.util.Arrays;
-
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -41,23 +39,17 @@ public class Level {
 	private float wallWidth = 2.0f;
 	
 	private float nubSize = 0.5f;
-	
-	private float slickPlatformChance = 0.15f; // 25% chance
-	
-//	private float chanceToSpawnDoublePlatform = 0.75f;
 
 	private int[] lastRow;
 	
 	private final float SCREEN_SEG = GameScreen.VIRTUAL_WIDTH/3;
 	
-	private StateMachine sm;
 	private Queue<PlatformComponent> queue;
 	private World world;
 	
 	public Level(World world) {
 		this.queue = new Queue<PlatformComponent>();
 		this.world = world;
-		this.sm = new StateMachine();
 	
 		this.walls = new Entity[2];
 	}
@@ -107,14 +99,8 @@ public class Level {
 				
 				xPos = getXPosBasedOnCurrentSeg(i, width);
 				
-				if(Rando.getRandomNumber() <= this.slickPlatformChance){
-					platforms[i].set(xPos, yPos, width, height, PlatformType.MOVE);
-				}else{
-					platforms[i].set(xPos, yPos, width, height); //Default Platform
-				}
-				
-				platforms[i].setSegment(this.getScreenSeg(xPos));
-				
+				platforms[i].set(xPos, yPos, width, height, platforms[i].rollForPlatformType());
+								
 				Body body = Box2dPlatformBuilder.DEFAULT(platforms[i]).buildAndDispose(world); // add body to world and retrieve it
 				
 				platforms[i].setBody(body);
@@ -139,7 +125,7 @@ public class Level {
 		Body body = Box2dPlatformBuilder.DEFAULT(p).build(world);
 		p.setBody(body);
 		
-		PowerupType puT = Rando.getRandomNumber() > 0.0f ? PowerupType.LIGHT : PowerupType.HELMET; 
+		PowerupType puT = Rando.getRandomNumber() > 0.25f ? PowerupType.LIGHT : PowerupType.HELMET; //25% for helmet, 75% for light
 		p.setType(puT);
 		if(p.getType() == PowerupType.LIGHT) p.setLightSystem();
 		
@@ -252,20 +238,6 @@ public class Level {
 		return index;
 	}
 	
-	private float getXPosBasedOnLastSeg(int lastSeg, float width){
-		if(lastSeg < 0){
-			return randomFloatInRange(MIN_X, GameScreen.VIRTUAL_WIDTH - MIN_X - width);
-		}else if(lastSeg == 0){ //Left => M || R
-			return randomFloatInRange(this.SCREEN_SEG + MIN_X, GameScreen.VIRTUAL_WIDTH - MIN_X - width);
-		}else if(lastSeg == 1){//Middle ==> L || R
-			return Rando.getRandomNumber() > 0.5f ? 
-					randomFloatInRange(MIN_X, this.SCREEN_SEG - MIN_X - width) : //Left
-					randomFloatInRange(this.SCREEN_SEG * 2, GameScreen.VIRTUAL_WIDTH - MIN_X - width); //Right
-		}else{//Right => L || M
-			return randomFloatInRange(MIN_X, this.SCREEN_SEG*2 - MIN_X - width);
-		}
-	}
-	
 	private float getNubPosBasedOnCurrentSeg(int seg){
 		if(seg == 0){
 			return this.SCREEN_SEG;
@@ -284,21 +256,6 @@ public class Level {
 		}else{//Right
 			return randomFloatInRange(this.SCREEN_SEG*2, GameScreen.VIRTUAL_WIDTH - MIN_X - width);
 		}
-	}
-	
-	private int getScreenSeg(float x){
-		int seg = 0;
-		
-		for(int i=1; i<4; i++){
-			float testSeg = this.SCREEN_SEG * i;
-			
-			if(x <= testSeg){
-				seg = i;
-				return seg;
-			}
-		}
-		
-		return seg;
 	}
 
 	public PlatformComponent getHead() {
