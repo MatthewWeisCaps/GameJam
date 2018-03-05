@@ -23,6 +23,7 @@ import com.jam.game.controllers.KeyboardController;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
 import com.jam.game.utils.enums.Category;
+import com.jam.game.utils.enums.PlatformType;
 
 public class PlayerControlSystem extends IteratingSystem {
 	KeyboardController controller;
@@ -64,6 +65,7 @@ public class PlayerControlSystem extends IteratingSystem {
 	protected void processEntity(Entity entity, float deltaTime) {
 		BodyComponent body = Mappers.bodyMap.get(entity);
 		StateComponent state = Mappers.stateMap.get(entity);
+		PlayerComponent player = Mappers.playerMap.get(entity);
 		
 		AnimationComponent anim = Mappers.animationMap.get(entity);
 		
@@ -117,7 +119,6 @@ public class PlayerControlSystem extends IteratingSystem {
 			state.ropeJoint.setMaxLength(len);
 			if (Gdx.input.isKeyJustPressed(Keys.SPACE)) { // cancel rope, but not isSwinging. isSwinging turns off upon landing, see contact listener
 				
-				System.out.println("end 1 (handled by playerController)");
 				this.getEngine().getSystem(PhysicsSystem.class).safelyMarkJointForDestruction(state);
 				
 				body.b2dBody.getLinearVelocity().scl(6.0f);
@@ -129,8 +130,6 @@ public class PlayerControlSystem extends IteratingSystem {
 			} else if(controller.right && !controller.left) {
 				body.b2dBody.applyForceToCenter(swingForce_right, true);
 				anim.currentAnimation = PlayerAnims.JUMP_RIGHT;
-			} else {
-				
 			}
 			
 			return;
@@ -141,7 +140,6 @@ public class PlayerControlSystem extends IteratingSystem {
 				// if not falling but isSwinging is true, then InvalidState!
 				// this invalid state happens when the floor/platform breaks phase 1 of rope swing which player then..
 				// .. stands on without jumping. This results in being unable to re-throw rope.
-				System.out.println("end 2 (handled by playerController)");
 				state.isSwinging = false;
 				return;
 			}
@@ -184,16 +182,19 @@ public class PlayerControlSystem extends IteratingSystem {
 		if(controller.left && !controller.right) {
 			lastXDir = -1;
 			_physXDir = -1;
-			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+			//body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+			player.doMovementBasedOnPlat(entity, _physXDir, speed);
 //			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else if(controller.right && !controller.left) {
 			lastXDir = 1;
 			_physXDir = 1;
-			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+//			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
+			player.doMovementBasedOnPlat(entity, _physXDir, speed);
 //			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else {
 			_physXDir = 0;
-			body.b2dBody.setLinearVelocity(0.0f, body.b2dBody.getLinearVelocity().y);
+//			body.b2dBody.setLinearVelocity(0.0f, body.b2dBody.getLinearVelocity().y);
+			player.resetPlayerX(entity);
 		}
 		
 		
@@ -202,6 +203,8 @@ public class PlayerControlSystem extends IteratingSystem {
 			body.b2dBody.applyLinearImpulse(0, 13.5f, body.b2dBody.getWorldCenter().x,body.b2dBody.getWorldCenter().y, true);
 			jumpCount++;
 			state.set(StateComponent.STATE_INAIR);
+			
+			player.setOnPlatType(PlatformType.DEFAULT);
 		}
 		
 		switch(state.get()) {

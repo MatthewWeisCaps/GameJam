@@ -13,6 +13,7 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
+import com.jam.game.utils.enums.PlatformType;
 
 public class Box2DContactListener implements ContactListener {
 
@@ -56,6 +57,19 @@ public class Box2DContactListener implements ContactListener {
 				
 				pc1.changeDir();
 				pc2.changeDir();
+			}else if((Mappers.platformMap.has(e1) && Mappers.playerMap.has(e2)) || (Mappers.playerMap.has(e1) && Mappers.platformMap.has(e2))){
+				PlatformComponent pc;
+				PlayerComponent player;
+				
+				if(Mappers.platformMap.get(e1) != null){
+					pc = Mappers.platformMap.get(e1);
+					player = Mappers.playerMap.get(e2);
+				}else{
+					pc = Mappers.platformMap.get(e2);
+					player = Mappers.playerMap.get(e1);
+				}
+				
+				player.setOnPlatType(pc.getType());
 			}
 		}
 		
@@ -91,7 +105,7 @@ public class Box2DContactListener implements ContactListener {
 
 	@Override
 	public void endContact(Contact contact) {
-		
+
 	}
 
 	@Override
