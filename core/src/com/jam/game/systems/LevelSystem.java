@@ -166,10 +166,7 @@ public class LevelSystem extends EntitySystem {
 				}
 				
 			}
-		} //end of spawning platforms
-		
-		Level.NUB_COUNT = 0;
-		
+		} //end of spawning platforms		
 		
 	}
 	

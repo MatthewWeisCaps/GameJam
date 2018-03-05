@@ -16,9 +16,7 @@ import com.jam.game.utils.enums.PowerupType;
 public class Level {
 	
 	private static final float SCALE = 1.0f;
-	
-	public static int NUB_COUNT = 0;
-	
+		
 	public static final float MIN_WIDTH = 3.50f / SCALE;
 	public static final float MAX_WIDTH = 4.75f / SCALE;
 	
@@ -38,7 +36,7 @@ public class Level {
 	public float wallHeight = 10.0f;
 	private float wallWidth = 2.0f;
 	
-	private float nubSize = 0.5f;
+	private float nubSize = 1.0f;
 
 	private int[] lastRow;
 	

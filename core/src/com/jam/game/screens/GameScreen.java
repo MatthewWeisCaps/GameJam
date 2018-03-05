@@ -134,7 +134,7 @@ public class GameScreen implements Screen {
 			this.engine.removeEntity(e);
 		}
 		engine.update(delta);
-		//b2dRenderer.render(world, camera.combined);
+//		b2dRenderer.render(world, camera.combined);
 		if(!playerDeath) {
 			Vector3 player3D = camera.project(new Vector3(Mappers.bodyMap.get(player).b2dBody.getPosition(), 0.0f), renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(), renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
 			

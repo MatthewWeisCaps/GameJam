@@ -33,12 +33,12 @@ public enum PlatformType {
 		for(int i=1; i<=3; i++){
 			regions.set(i-1, new TextureRegion(GameScreen.PLATFORM_TEXTURE, i*32, 3*32, 32, 32));
 		}
-		AnimatedBox2DSprite spin = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+		AnimatedBox2DSprite flap = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 			
-		spin.setUseOrigin(false);
-		spin.setScale(5f);
-		spin.setPosition(0, 0);
+		flap.setUseOrigin(false);
+		flap.setScale(2.5f);
+		flap.setPosition(0, 0);
 	
-		return spin;
+		return flap;
 	}
 }
