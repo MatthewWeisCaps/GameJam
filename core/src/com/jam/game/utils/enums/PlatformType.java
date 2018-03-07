@@ -10,13 +10,14 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public enum PlatformType {
-	OIL((TextureRegion) new TextureRegion(GameScreen.PLATFORM_TEXTURE, 0, 3*32, 32, 7)), 
-	MOVE((TextureRegion) new TextureRegion(GameScreen.PLATFORM_TEXTURE, 2*32, 0, 32, 7)), 
-	DAMAGE((TextureRegion) new TextureRegion(GameScreen.PLATFORM_TEXTURE, 2*32, 0, 32, 7)), 
-	NUB((TextureRegion) new TextureRegion(GameScreen.PLATFORM_TEXTURE, 2*32, 0, 32, 7)),
-	DEFAULT((TextureRegion) new TextureRegion(GameScreen.PLATFORM_TEXTURE, 2*32, 0, 32, 7));
+	OIL((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0, 3*32, 32, 7)), 
+	MOVE((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)), 
+	DAMAGE((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)), 
+	NUB((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)),
+	DEFAULT((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7));
 	
 	private final TextureRegion texture;
+
 	
 	PlatformType(TextureRegion texture){
 		this.texture = texture;
@@ -31,7 +32,7 @@ public enum PlatformType {
 		regions.setSize(3);
 		
 		for(int i=1; i<=3; i++){
-			regions.set(i-1, new TextureRegion(GameScreen.PLATFORM_TEXTURE, i*32, 3*32, 32, 32));
+			regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), i*32, 3*32, 32, 32));
 		}
 		AnimatedBox2DSprite flap = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 			

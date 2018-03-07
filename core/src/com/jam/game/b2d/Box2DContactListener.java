@@ -13,7 +13,6 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
-import com.jam.game.utils.enums.PlatformType;
 
 public class Box2DContactListener implements ContactListener {
 

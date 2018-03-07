@@ -182,18 +182,13 @@ public class PlayerControlSystem extends IteratingSystem {
 		if(controller.left && !controller.right) {
 			lastXDir = -1;
 			_physXDir = -1;
-			//body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
 			player.doMovementBasedOnPlat(entity, _physXDir, speed);
-//			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else if(controller.right && !controller.left) {
 			lastXDir = 1;
 			_physXDir = 1;
-//			body.b2dBody.setLinearVelocity(_physXDir*speed, body.b2dBody.getLinearVelocity().y);
 			player.doMovementBasedOnPlat(entity, _physXDir, speed);
-//			body.b2dBody.setLinearVelocity(MathUtils.lerp(body.b2dBody.getLinearVelocity().x, _physXDir * speed, 1.0f), body.b2dBody.getLinearVelocity().y);
 		} else {
 			_physXDir = 0;
-//			body.b2dBody.setLinearVelocity(0.0f, body.b2dBody.getLinearVelocity().y);
 			player.resetPlayerX(entity);
 		}
 		

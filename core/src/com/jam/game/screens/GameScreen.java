@@ -34,6 +34,7 @@ import com.jam.game.components.TransformComponent;
 import com.jam.game.components.TypeComponent;
 import com.jam.game.controllers.KeyboardController;
 import com.jam.game.levels.Level;
+import com.jam.game.managers.FileManager;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.LevelSystem;
@@ -54,20 +55,22 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 
-public class GameScreen implements Screen {
+public class GameScreen implements CustomScreen {
 	
 	public static final int VIRTUAL_WIDTH = 480/8;//480/10
 	public static final int VIRTUAL_HEIGHT = 800/10;//
 	public static final int UNIT = 2;
 	
+	public static FileManager fileManager;
+
 	private Game game;
 	
 	public boolean playerDeath = false;
 	
-	public final static Texture TEXTURE = new Texture("full_sheet.png");
-	public final static Texture PLATFORM_TEXTURE = new Texture("platforms_ALL.png");
+	public final static Texture TEXTURE = new Texture("full_sheet.png"); //TODO: Replace with respective stuff (Character sheet)
+	//public final static Texture PLATFORM_TEXTURE = new Texture("platform/platforms_ALL.png");
 	
-	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("gameplay_music.mp3"));
+	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music.mp3"));
 	
 	World world;
 	PooledEngine engine;
@@ -155,7 +158,7 @@ public class GameScreen implements Screen {
 
 	
 	public void death() {
-		Music deathSound =  Gdx.audio.newMusic(Gdx.files.internal("death_effect_cut.mp3"));
+		Music deathSound = this.fileManager.getMusicFile("death_sound"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/death_sound.mp3"));
 		deathSound.setVolume(deathSound.getVolume()/4);
 		deathSound.play();
 		
@@ -468,6 +471,24 @@ public class GameScreen implements Screen {
 		sb.dispose();
 		gameMusic.dispose();
 		engine.removeAllEntities();
+	}
+
+	@Override
+	public void loadAssets(FileManager manager) {
+		String[] music = new String[]{
+			"death_sound"
+		};
+		
+		String[] textures = new String[]{
+			"platforms",
+			"powerups",
+			"game_over"
+		};
+		
+		fileManager = manager;
+		
+		fileManager.loadAssets(textures, music);
+		
 	}
 
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.jam.game.screens.GameScreen;
 import com.jam.game.systems.LightingSystem;
 import com.jam.game.utils.enums.PowerupType;
 
@@ -18,7 +19,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class Powerup implements Component, Poolable {
-	private final static Texture texture = new Texture(Gdx.files.internal("powerups_ALL.png"));
+	private final static Texture texture = GameScreen.fileManager.getTextureFile("powerups");//new Texture(Gdx.files.internal("powerup/powerups_ALL.png"));
 	
 	public float x, y, width, height;
 	public PowerupType type;

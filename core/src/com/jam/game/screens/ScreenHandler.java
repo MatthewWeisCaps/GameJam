@@ -3,30 +3,34 @@ package com.jam.game.screens;
 import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ai.DefaultTimepiece;
 import com.badlogic.gdx.ai.GdxAI;
 import com.jam.game.Game;
+import com.jam.game.managers.FileManager;
 import com.jam.game.utils.enums.ScreenType;
 
 public class ScreenHandler {
 	
 	private Game g;
 	
-	private HashMap<ScreenType, Screen> screens;
+	private HashMap<ScreenType, CustomScreen> screens;
 	
 	private ScreenType current;
 	
+	private FileManager manager;
+	
 	public ScreenHandler(Game game){
-		this.screens = new HashMap<ScreenType, Screen>();
+		this.screens = new HashMap<ScreenType, CustomScreen>();
 		
 		this.g = game;
-		this.current = ScreenType.PLAY;
+		this.current = ScreenType.START;
 		
 		screens.put(ScreenType.START, new StartScreen(this.g));
 		screens.put(ScreenType.PAUSE, new PauseScreen(this.g));
 		screens.put(ScreenType.PLAY, new GameScreen(this.g));
 		screens.put(ScreenType.DEATH, new DeathScreen(this.g));
+		
+		this.manager = new FileManager();
 		
 		this.showCurrentScreen();
 	}
@@ -34,6 +38,7 @@ public class ScreenHandler {
 	public void showCurrentScreen(){
 		GdxAI.setTimepiece(new DefaultTimepiece());
 		
+		this.screens.get(this.current).loadAssets(this.manager);
 		this.screens.get(this.current).show();
 		this.screens.get(this.current).resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
@@ -49,11 +54,11 @@ public class ScreenHandler {
 		this.current = toSet;
 	}
 	
-	public Screen getCurrentScreen(){
+	public CustomScreen getCurrentScreen(){
 		return this.screens.get(this.current);
 	}
 	
-	private Screen returnNewScreenType(){
+	private CustomScreen returnNewScreenType(){
 		switch(this.current){
 		
 		case START:

@@ -13,15 +13,17 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.Game;
+import com.jam.game.managers.FileManager;
 import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
-public class DeathScreen implements Screen{
+public class DeathScreen implements CustomScreen{
 	public final static int VIRTUAL_WIDTH = 32;
 	public final static int VIRTUAL_HEIGHT = 32;
 
 	private Game game;
+	private FileManager fileManager;
 	
 	private Music music;
 		
@@ -37,7 +39,7 @@ public class DeathScreen implements Screen{
     
 	@Override
 	public void show() {		
-		music = Gdx.audio.newMusic(Gdx.files.internal("death_music_2_cut.mp3"));
+		music = this.fileManager.getMusicFile("death_music");//Gdx.audio.newMusic(Gdx.files.internal("sounds/death_music_2_cut.mp3"));
 		music.setVolume(music.getVolume()/3);
 		music.play();
 		music.setLooping(false);
@@ -69,7 +71,7 @@ public class DeathScreen implements Screen{
 	
 	public Animation<TextureRegion> getAnimationRegions() {
 		Animation<TextureRegion> region;
-		Texture t = new Texture("game_over.png");
+		Texture t = this.fileManager.getTextureFile("game_over");//new Texture("screens/game_over.png");
 		
 		//Death Animation
 		Array<TextureRegion> r = new Array<TextureRegion>(2);
@@ -104,6 +106,22 @@ public class DeathScreen implements Screen{
 	@Override
 	public void dispose() {
 		batch.dispose();
-		music.dispose();
+//		music.dispose();
+		this.fileManager.clearAssets();
+	}
+
+	@Override
+	public void loadAssets(FileManager manager) {
+		String[] music = new String[]{
+			"death_music"
+		};
+		
+		String[] textures = new String[]{
+			"game_over"
+		};
+		
+		this.fileManager = manager;
+		
+		this.fileManager.loadAssets(textures, music);
 	}
 }

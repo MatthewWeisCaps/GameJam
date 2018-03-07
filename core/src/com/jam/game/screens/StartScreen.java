@@ -3,7 +3,6 @@ package com.jam.game.screens;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,17 +14,20 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.jam.game.Game;
+import com.jam.game.managers.FileManager;
 import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
-public class StartScreen implements Screen{
+public class StartScreen implements CustomScreen{
 	private Game game;
 	
 	public final static int VIRTUAL_WIDTH = 32;
 	public final static int VIRTUAL_HEIGHT = 32;
 	
-	private Music music;
+	private FileManager fileManager;
+	
+	private Music song;
 	private Music soundEfct;
 	
 	OrthographicCamera camera;
@@ -42,14 +44,15 @@ public class StartScreen implements Screen{
     
 	@Override
 	public void show() {
-		music = Gdx.audio.newMusic(Gdx.files.internal("title_music.mp3"));
 		
-		soundEfct = Gdx.audio.newMusic(Gdx.files.internal("start_sound.mp3"));
+		song = this.fileManager.getMusicFile("title_music"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/title_music.mp3"));
+		
+		soundEfct = this.fileManager.getMusicFile("start_sound"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/start_sound.mp3"));
 		soundEfct.setVolume(soundEfct.getVolume()/2);
 		
-		music.setVolume(music.getVolume()/3);
-		music.play();
-		music.setLooping(true);
+		song.setVolume(song.getVolume()/3);
+		song.play();
+		song.setLooping(true);
 		
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
@@ -72,15 +75,15 @@ public class StartScreen implements Screen{
 		
 		if (sprite.isAnimationFinished()) {
 			if(onScreen == 0){
-				sprite = new AnimatedSprite(animationRegions.	get(++onScreen));
+				sprite = new AnimatedSprite(animationRegions.get(++onScreen));
 			} else if(onScreen == 1){
 				if(Gdx.input.isKeyJustPressed(Keys.ENTER)){
 					sprite = new AnimatedSprite(animationRegions.get(++onScreen));
-					music.setVolume(music.getVolume()/2);
+					song.setVolume(song.getVolume()/2);
 					soundEfct.play();
 				}
 			}else if(onScreen >= 2){
-				music.pause();
+				song.pause();
 				this.game.moveToNextScreen(ScreenType.PLAY);
 			}
 			
@@ -89,7 +92,7 @@ public class StartScreen implements Screen{
 	
 	public ArrayList<Animation<TextureRegion>> getAnimationRegions() {
 		ArrayList<Animation<TextureRegion>> regions = new ArrayList<Animation<TextureRegion>>();
-		Texture t = new Texture("intro_scroll.png");
+		Texture t = this.fileManager.getTextureFile("intro_scroll");//new Texture("screens/intro_scroll.png");
 		
 		//Intro
 		Array<TextureRegion> r = new Array<TextureRegion>(43);
@@ -103,7 +106,7 @@ public class StartScreen implements Screen{
 		//Start Screen
 		r = new Array<TextureRegion>(8);
 		r.setSize(8);
-		t = new Texture("title_screen.png");
+		t = this.fileManager.getTextureFile("title_screen");//new Texture("screens/title_screen.png");
 		for(int i=0; i<8; i++) {
 			r.set(i, new TextureRegion(t, i*32, 0, 32, 32));
 		}
@@ -113,7 +116,7 @@ public class StartScreen implements Screen{
 		//Pressed Start Screen
 		r = new Array<TextureRegion>(20);
 		r.setSize(20);
-		t = new Texture("after_press_start.png");
+		t = this.fileManager.getTextureFile("after_press_start");//new Texture("screens/after_press_start.png");
 		for(int i=0; i<20; i++) {
 			r.set(i, new TextureRegion(t, i*32, 0, 32, 32));
 		}
@@ -146,8 +149,28 @@ public class StartScreen implements Screen{
 	@Override
 	public void dispose() {
 		batch.dispose();
-		music.dispose();
-		soundEfct.dispose();
+//		song.dispose();
+//		soundEfct.dispose();
+		this.fileManager.clearAssets();
+	}
+
+	@Override
+	public void loadAssets(FileManager manager) {
+		String[] music = new String[]{
+			//"title_scroll_music", //wtf is this one??
+			"title_music",
+			"start_sound"
+		};
+		
+		String[] textures = new String[]{
+			"title_screen",
+			"intro_scroll",
+			"after_press_start"
+		};
+		
+		this.fileManager = manager;
+		
+		this.fileManager.loadAssets(textures, music);
 	}
 
 }

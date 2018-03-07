@@ -1,9 +1,9 @@
 package com.jam.game.screens;
 
-import com.badlogic.gdx.Screen;
 import com.jam.game.Game;
+import com.jam.game.managers.FileManager;
 
-public class PauseScreen implements Screen{
+public class PauseScreen implements CustomScreen{
 	private Game game;
 	
 	public PauseScreen(Game game){
@@ -48,6 +48,12 @@ public class PauseScreen implements Screen{
 
 	@Override
 	public void dispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void loadAssets(FileManager manager) {
 		// TODO Auto-generated method stub
 		
 	}

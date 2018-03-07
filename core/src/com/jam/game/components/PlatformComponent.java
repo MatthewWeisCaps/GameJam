@@ -17,7 +17,7 @@ public class PlatformComponent implements Component, Poolable{
 	private Body body; // body associated w/ this platform
 	
 	private int dir = 0; //Used only for moving platforms
-	public static final float SPEED = 2.0f;
+	public final float SPEED = 2.0f;
 	private PlatformType type;
 		
 	public PlatformComponent() {
