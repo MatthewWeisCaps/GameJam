@@ -32,11 +32,8 @@ public class FileManager {
 		this.manager.finishLoading();
 	}
 	
-	public Music getMusicFile(String fileName){
-//		while(!this.manager.isLoaded(fileMap.get(fileName))){}
-		
+	public Music getMusicFile(String fileName){		
 		return this.manager.get(fileMap.get(fileName));
-		
 	}
 	
 	public Texture getTextureFile(String fileName){

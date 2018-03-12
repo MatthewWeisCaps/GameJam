@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -48,7 +47,6 @@ import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
-import com.jam.game.utils.enums.PlatformType;
 import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
@@ -68,6 +66,7 @@ public class GameScreen implements CustomScreen {
 	public boolean playerDeath = false;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png"); //TODO: Replace with respective stuff (Character sheet)
+	public final static Texture UI = new Texture("UI/numbers.png");
 	//public final static Texture PLATFORM_TEXTURE = new Texture("platform/platforms_ALL.png");
 	
 	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music.mp3"));
@@ -78,6 +77,7 @@ public class GameScreen implements CustomScreen {
 	private OrthographicCamera camera; // link to renderingsystem cam
 	KeyboardController controller;
 	SpriteBatch sb;
+	SpriteBatch ui;
 	RenderingSystem renderingSystem;
 	Entity player;
 	
@@ -93,6 +93,8 @@ public class GameScreen implements CustomScreen {
 		gameMusic.setLooping(true);
 		
 		world = new World(new Vector2(0, -20f), true);
+		
+		ui = new SpriteBatch();
 		
 		sb = new SpriteBatch();
 		//Create our rendering system
@@ -146,6 +148,10 @@ public class GameScreen implements CustomScreen {
 				death();
 			}
 		}
+		
+		ui.begin();
+		ui.draw(UI, 0, VIRTUAL_HEIGHT * 10 - (VIRTUAL_HEIGHT/3)); //So magic
+		ui.end();
 	}
 
 	@Override
@@ -158,7 +164,7 @@ public class GameScreen implements CustomScreen {
 
 	
 	public void death() {
-		Music deathSound = this.fileManager.getMusicFile("death_sound"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/death_sound.mp3"));
+		Music deathSound = fileManager.getMusicFile("death_sound"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/death_sound.mp3"));
 		deathSound.setVolume(deathSound.getVolume()/4);
 		deathSound.play();
 		
@@ -482,6 +488,7 @@ public class GameScreen implements CustomScreen {
 		String[] textures = new String[]{
 			"platforms",
 			"powerups",
+			"numbers",
 			"game_over"
 		};
 		
