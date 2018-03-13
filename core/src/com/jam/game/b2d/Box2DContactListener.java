@@ -1,17 +1,19 @@
 package com.jam.game.b2d;
 
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.JointEdge;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.jam.game.components.BodyComponent;
 import com.jam.game.components.PlatformComponent;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.StateComponent;
+import com.jam.game.screens.GameScreen;
 import com.jam.game.systems.PhysicsSystem;
-import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
 
 public class Box2DContactListener implements ContactListener {
@@ -40,7 +42,11 @@ public class Box2DContactListener implements ContactListener {
 				
 				puc.handleCollisions(pc);
 				
-				EntityManager.remove(e1);
+				BodyComponent b = Mappers.bodyMap.get(e1);
+				
+				puc.powerup.removeLightSystem();
+				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
+				GameScreen.removalSystem.scheduleForRemoval(e1);
 				
 			}else if(Mappers.powerupMap.has(e2) && Mappers.playerMap.has(e1)){
 				PowerupComponent puc = Mappers.powerupMap.get(e2);
@@ -48,7 +54,12 @@ public class Box2DContactListener implements ContactListener {
 				
 				puc.handleCollisions(pc);
 				
-				EntityManager.remove(e2);
+				BodyComponent b = Mappers.bodyMap.get(e2);
+				
+				puc.powerup.removeLightSystem();
+				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
+				GameScreen.removalSystem.scheduleForRemoval(e2);
+
 				
 			}else if(Mappers.platformMap.has(e1) && Mappers.platformMap.has(e2)){
 				PlatformComponent pc1 = Mappers.platformMap.get(e1);

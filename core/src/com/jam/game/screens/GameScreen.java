@@ -36,13 +36,13 @@ import com.jam.game.levels.Level;
 import com.jam.game.managers.FileManager;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.systems.CollisionSystem;
+import com.jam.game.systems.DelayedRemovalSystem;
 import com.jam.game.systems.LevelSystem;
 import com.jam.game.systems.LightingSystem;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.systems.PlayerControlSystem;
 import com.jam.game.systems.PlayerSystem;
 import com.jam.game.systems.RenderingSystem;
-import com.jam.game.utils.EntityManager;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
 import com.jam.game.utils.enums.Category;
@@ -58,9 +58,11 @@ public class GameScreen implements CustomScreen {
 	public static final int VIRTUAL_WIDTH = 480/8;//480/10
 	public static final int VIRTUAL_HEIGHT = 800/10;//
 	public static final int UNIT = 2;
-	
+		
 	public static FileManager fileManager;
 
+	public static DelayedRemovalSystem removalSystem;
+	
 	private Game game;
 	
 	public boolean playerDeath = false;
@@ -120,6 +122,9 @@ public class GameScreen implements CustomScreen {
 
 		world.setContactListener(new Box2DContactListener(engine.getSystem(PhysicsSystem.class)));
 		
+		removalSystem = new DelayedRemovalSystem(world);
+		engine.addSystem(removalSystem);
+		
 		engine.addSystem(new LevelSystem(camera, Mappers.bodyMap.get(player).b2dBody, new Level(world)));
 		engine.addSystem(new LightingSystem(player, world, camera));
 		
@@ -128,16 +133,6 @@ public class GameScreen implements CustomScreen {
 		
 	@Override
 	public void render(float delta) {
-		for(Entity e : EntityManager.entitiesToRemove){
-			if(Mappers.bodyMap.get(e) == null || Mappers.powerupMap.get(e) == null) continue;
-			
-			Powerup p = Mappers.powerupMap.get(e).powerup;
-			p.removeLightSystem();
-			Body b = Mappers.bodyMap.get(e).b2dBody;
-			
-			this.world.destroyBody(b);
-			this.engine.removeEntity(e);
-		}
 		engine.update(delta);
 //		b2dRenderer.render(world, camera.combined);
 		if(!playerDeath) {

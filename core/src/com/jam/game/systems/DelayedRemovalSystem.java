@@ -15,37 +15,6 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
 
-/*
- * Class which couples entity with a potential action.
- * Also overrides hashCode and equals, so that regardless of the action, no two entities can be queued together
- * (Note that the methods equals/hashCode are how a Set determines if a set already contains a given object)
- */
-class EntityActionTuple {
-	Entity entity;
-	Consumer<Entity> consumer; // can be null
-	
-	EntityActionTuple(Entity entity, Consumer<Entity> consumer) {
-		this.entity = entity;
-		this.consumer = consumer;
-	}
-	
-	EntityActionTuple(Entity entity) {
-		this(entity, null);
-	}
-	
-	@Override
-	public int hashCode() {
-		return entity.hashCode();
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof EntityActionTuple) {
-			return ((EntityActionTuple)obj).entity.equals(entity);
-		}
-		return false;
-	}
-}
 
 public class DelayedRemovalSystem extends EntitySystem {
 	
@@ -57,7 +26,7 @@ public class DelayedRemovalSystem extends EntitySystem {
 	private ObjectSet<Joint> pendingJointRemovals = new ObjectSet<Joint>();
 	
 	public DelayedRemovalSystem(World world) {
-		super(Priority.POST_PHYSICS.PRIORITY); // this should go off after the physics engine but before rendering
+		super(Priority.POST_PHYSICS.PRIORITY);//.POST_PHYSICS.PRIORITY); // this should go off after the physics engine but before rendering
 		this.world = world;
 	}
 	
@@ -67,12 +36,12 @@ public class DelayedRemovalSystem extends EntitySystem {
 	 */
 	@Override
 	public boolean checkProcessing() {
-		return (pendingEntityRemovals.first() == null && pendingBodyRemovals.first() == null && pendingJointRemovals.first() == null);
+		//return (pendingEntityRemovals.first() == null && pendingBodyRemovals.first() == null && pendingJointRemovals.first() == null);
+		return (pendingEntityRemovals.size > 0 || pendingBodyRemovals.size > 0 || pendingJointRemovals.size > 0);
 	}
 	
 	@Override
 	public void update(float deltaTime) {
-		
 		// destroy pending joints
 		Iterator<Joint> jointIter = pendingJointRemovals.iterator();
 		while (jointIter.hasNext()) {
@@ -112,6 +81,8 @@ public class DelayedRemovalSystem extends EntitySystem {
 					}
 				}
 			}
+			
+			this.getEngine().removeEntity(tuple.entity);
 		}
 		
 		// remove all pending removals
@@ -137,5 +108,37 @@ public class DelayedRemovalSystem extends EntitySystem {
 	
 	public boolean scheduleForRemoval(Joint joint) {
 		return pendingJointRemovals.add(joint);
+	}
+	
+	/*
+	 * Class which couples entity with a potential action.
+	 * Also overrides hashCode and equals, so that regardless of the action, no two entities can be queued together
+	 * (Note that the methods equals/hashCode are how a Set determines if a set already contains a given object)
+	 */
+	class EntityActionTuple {
+		Entity entity;
+		Consumer<Entity> consumer; // can be null
+		
+		EntityActionTuple(Entity entity, Consumer<Entity> consumer) {
+			this.entity = entity;
+			this.consumer = consumer;
+		}
+		
+		EntityActionTuple(Entity entity) {
+			this(entity, null);
+		}
+		
+		@Override
+		public int hashCode() {
+			return entity.hashCode();
+		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (obj instanceof EntityActionTuple) {
+				return ((EntityActionTuple)obj).entity.equals(entity);
+			}
+			return false;
+		}
 	}
 }
