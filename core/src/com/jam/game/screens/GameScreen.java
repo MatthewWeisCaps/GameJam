@@ -22,6 +22,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.jam.game.Game;
+import com.jam.game.UI.UI;
 import com.jam.game.b2d.Box2DContactListener;
 import com.jam.game.b2d.Box2dPlatformBuilder;
 import com.jam.game.components.AnimationComponent;
@@ -34,7 +35,6 @@ import com.jam.game.components.TypeComponent;
 import com.jam.game.controllers.KeyboardController;
 import com.jam.game.levels.Level;
 import com.jam.game.managers.FileManager;
-import com.jam.game.powerup.Powerup;
 import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.DelayedRemovalSystem;
 import com.jam.game.systems.LevelSystem;
@@ -64,11 +64,12 @@ public class GameScreen implements CustomScreen {
 	public static DelayedRemovalSystem removalSystem;
 	
 	private Game game;
+	private UI ui;
 	
 	public boolean playerDeath = false;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png"); //TODO: Replace with respective stuff (Character sheet)
-	public final static Texture UI = new Texture("UI/numbers.png");
+	
 	//public final static Texture PLATFORM_TEXTURE = new Texture("platform/platforms_ALL.png");
 	
 	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music.mp3"));
@@ -79,7 +80,6 @@ public class GameScreen implements CustomScreen {
 	private OrthographicCamera camera; // link to renderingsystem cam
 	KeyboardController controller;
 	SpriteBatch sb;
-	SpriteBatch ui;
 	RenderingSystem renderingSystem;
 	Entity player;
 	
@@ -95,9 +95,7 @@ public class GameScreen implements CustomScreen {
 		gameMusic.setLooping(true);
 		
 		world = new World(new Vector2(0, -20f), true);
-		
-		ui = new SpriteBatch();
-		
+				
 		sb = new SpriteBatch();
 		//Create our rendering system
 		renderingSystem = new RenderingSystem(sb);
@@ -129,6 +127,8 @@ public class GameScreen implements CustomScreen {
 		engine.addSystem(new LightingSystem(player, world, camera));
 		
 		engine.addSystem(new PlayerSystem(player));
+		
+		ui = new UI(new SpriteBatch(), engine.getSystem(LevelSystem.class));
 	}
 		
 	@Override
@@ -144,9 +144,7 @@ public class GameScreen implements CustomScreen {
 			}
 		}
 		
-		ui.begin();
-		ui.draw(UI, 0, VIRTUAL_HEIGHT * 10 - (VIRTUAL_HEIGHT/3)); //So magic
-		ui.end();
+		this.ui.draw();
 	}
 
 	@Override
