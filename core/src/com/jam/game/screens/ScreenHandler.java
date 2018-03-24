@@ -23,7 +23,7 @@ public class ScreenHandler {
 		this.screens = new HashMap<ScreenType, CustomScreen>();
 		
 		this.g = game;
-		this.current = ScreenType.PLAY;
+		this.current = ScreenType.START;
 		
 		screens.put(ScreenType.START, new StartScreen(this.g));
 		screens.put(ScreenType.PAUSE, new PauseScreen(this.g));
