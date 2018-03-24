@@ -240,8 +240,7 @@ public class PlayerControlSystem extends IteratingSystem {
 				jointDef.bodyA = body.b2dBody;
 				
 				jointDef.bodyB = callback.fixture.getBody();
-				
-				System.out.println("HIT : " + callback.fixture.getFilterData().categoryBits + " CHECKING: " + Category.POWERUP.getValue());
+			
 				jointDef.collideConnected = true;
 
 				state.validThrow = callback.fixture.getFilterData().categoryBits != Category.POWERUP.getValue();

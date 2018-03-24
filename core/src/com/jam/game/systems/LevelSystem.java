@@ -42,7 +42,7 @@ public class LevelSystem extends EntitySystem {
 	private final float ITEM_CHANCE = 0.50f; //must be larger than
 	
 	public LevelSystem(OrthographicCamera cam, Body playerBody, Level level) {
-		super(Priority.PHYSICS.PRIORITY);
+		super(Priority.POST_RENDER.PRIORITY);
 		this.level = level;
 		this.cam = cam;
 		

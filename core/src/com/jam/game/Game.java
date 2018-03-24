@@ -11,7 +11,7 @@ import com.jam.game.utils.enums.ScreenType;
 
 public class Game implements ApplicationListener {
 	
-	private ScreenHandler screenHandler;
+	private static ScreenHandler screenHandler;
 	
 	public void moveToNextScreen(ScreenType screen){
 		this.screenHandler.moveToScreenAndDispose(screen);
@@ -53,5 +53,9 @@ public class Game implements ApplicationListener {
 	@Override
 	public void resume() {
 		this.screenHandler.getCurrentScreen().resume();
+	}
+	
+	public static ScreenHandler getScreenHandler(){
+		return screenHandler;
 	}
 }

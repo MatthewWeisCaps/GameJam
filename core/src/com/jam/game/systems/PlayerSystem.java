@@ -2,8 +2,11 @@ package com.jam.game.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.math.Vector3;
+import com.jam.game.Game;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.components.StateComponent;
+import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Mappers;
 
 
@@ -13,6 +16,7 @@ public class PlayerSystem extends EntitySystem{
 	private PlayerComponent pc;
 	
 	public PlayerSystem(Entity player){
+		super(Priority.POST_PHYSICS.PRIORITY);
 		this.player = player;
 		this.pc = Mappers.playerMap.get(this.player);
 	}
@@ -21,6 +25,7 @@ public class PlayerSystem extends EntitySystem{
     public void update(float deltaTime) {
     	super.update(deltaTime);
 
+    	this.checkDeath();
     	StateComponent st = Mappers.stateMap.get(this.player);
     	
     	int state = st.get();
@@ -56,6 +61,21 @@ public class PlayerSystem extends EntitySystem{
 		}
 		
 		this.changeDist(this.pc.powerupBonusValue);
+	}
+	
+	private void checkDeath(){
+		RenderingSystem rs = super.getEngine().getSystem(RenderingSystem.class);
+		Vector3 player3D = rs.getCamera().project(new Vector3(Mappers.bodyMap.get(player).b2dBody.getPosition(), 0.0f), rs.getViewport().getScreenX(), rs.getViewport().getScreenY(), rs.getViewport().getScreenWidth(), rs.getViewport().getScreenHeight());
+		
+		if(player3D.y < -40.0f) {
+			StateComponent sc = Mappers.stateMap.get(player);
+			sc.isSwinging = false;
+			death();
+		}
+	}
+	
+	private void death(){
+		((GameScreen)Game.getScreenHandler().getCurrentScreen()).gameOver(Mappers.bodyMap.get(this.player).b2dBody);
 	}
 
 }

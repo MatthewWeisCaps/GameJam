@@ -24,7 +24,7 @@ public class ScreenHandler implements Disposable {
 		this.screens = new HashMap<ScreenType, CustomScreen>();
 		
 		this.g = game;
-		this.current = ScreenType.START;
+		this.current = ScreenType.PLAY;
 		
 		screens.put(ScreenType.START, new StartScreen(this.g));
 		screens.put(ScreenType.PAUSE, new PauseScreen(this.g));

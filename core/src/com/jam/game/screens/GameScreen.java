@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -63,6 +62,8 @@ public class GameScreen implements CustomScreen {
 	public static FileManager fileManager;
 
 	public static DelayedRemovalSystem removalSystem;
+	
+	public static boolean endGame  = false;
 	
 	private Game game;
 	private UI ui;
@@ -136,14 +137,6 @@ public class GameScreen implements CustomScreen {
 	public void render(float delta) {
 		engine.update(delta);
 //		b2dRenderer.render(world, camera.combined);
-		if(!playerDeath) {
-			Vector3 player3D = camera.project(new Vector3(Mappers.bodyMap.get(player).b2dBody.getPosition(), 0.0f), renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(), renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
-			
-			if(player3D.y < -40.0f) {
-				playerDeath = true;
-				death();
-			}
-		}
 		
 		this.ui.draw();
 	}
@@ -155,14 +148,18 @@ public class GameScreen implements CustomScreen {
 				renderingSystem.getViewport().getScreenX(), renderingSystem.getViewport().getScreenY(),
 				renderingSystem.getViewport().getScreenWidth(), renderingSystem.getViewport().getScreenHeight());
 	}
-
 	
-	public void death() {
+	public void gameOver(Body playerBody) {
+		
+		if (playerDeath) return;
+		
 		Music deathSound = fileManager.getMusicFile("death_sound"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/death_sound.mp3"));
 		deathSound.setVolume(deathSound.getVolume()/4);
 		deathSound.play();
 		
 		gameMusic.setVolume(gameMusic.getVolume()/4);
+		
+		playerDeath = true;
 		
 		deathSound.setOnCompletionListener(new Music.OnCompletionListener() {
 		    @Override
@@ -171,6 +168,7 @@ public class GameScreen implements CustomScreen {
 		    	game.moveToNextScreen(ScreenType.DEATH);
 		    }
 		});		
+		
 	}
 	
 	Entity createPlayer() {
@@ -466,11 +464,11 @@ public class GameScreen implements CustomScreen {
 
 	@Override
 	public void dispose() {
+		engine.removeAllEntities();
 		world.dispose();
 		b2dRenderer.dispose();
 		sb.dispose();
 		gameMusic.dispose();
-		engine.removeAllEntities();
 	}
 
 	@Override

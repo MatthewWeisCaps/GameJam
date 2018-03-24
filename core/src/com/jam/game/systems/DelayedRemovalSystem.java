@@ -10,10 +10,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Joint;
+import com.badlogic.gdx.physics.box2d.JointEdge;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.jam.game.components.BodyComponent;
 
 
 public class DelayedRemovalSystem extends EntitySystem {
@@ -67,6 +69,12 @@ public class DelayedRemovalSystem extends EntitySystem {
 			}
 			
 			for (Component component : tuple.entity.getComponents()) {
+//				if (component instanceof BodyComponent){
+//					for(JointEdge je : ((BodyComponent)component).b2dBody.getJointList().items){
+//						this.world.destroyJoint(je.joint);
+//					}
+//					this.world.destroyBody(((BodyComponent)component).b2dBody);
+//				}
 				if (component instanceof Poolable) {
 					((Poolable)component).reset(); // do we need to reset pooled components??
 				}
