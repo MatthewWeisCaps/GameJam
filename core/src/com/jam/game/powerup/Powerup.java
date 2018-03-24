@@ -18,7 +18,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class Powerup implements Component, Poolable {
-	private final static Texture texture = GameScreen.fileManager.getTextureFile("powerups");//new Texture(Gdx.files.internal("powerup/powerups_ALL.png"));
+//	private Texture texture = GameScreen.fileManager.getTextureFile("powerups");//new Texture(Gdx.files.internal("powerup/powerups_ALL.png"));
 	
 	public float x, y, width, height;
 	public PowerupType type;
@@ -94,7 +94,7 @@ public class Powerup implements Component, Poolable {
 					break;
 				}
 				
-				regions.set(count, new TextureRegion(texture, j*32, i*32, 32, 32));
+				regions.set(count, new TextureRegion(GameScreen.fileManager.getTextureFile("powerups"), j*32, i*32, 32, 32));
 				count++;
 			}
 		}
@@ -119,7 +119,7 @@ public class Powerup implements Component, Poolable {
 				if(i == 6 && j >= 4){
 					break;
 				}
-				regions.set(count, new TextureRegion(texture, j*32, i*32, 32, 32));
+				regions.set(count, new TextureRegion(GameScreen.fileManager.getTextureFile("powerups"), j*32, i*32, 32, 32));
 				count++;
 			}
 		}
@@ -134,7 +134,6 @@ public class Powerup implements Component, Poolable {
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
 		
 	}
 }

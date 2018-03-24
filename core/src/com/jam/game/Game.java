@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.graphics.GL20;
 import com.jam.game.screens.ScreenHandler;
+import com.jam.game.utils.enums.PlatformType;
 import com.jam.game.utils.enums.ScreenType;
 
 public class Game implements ApplicationListener {
@@ -36,7 +37,7 @@ public class Game implements ApplicationListener {
 	
 	@Override
 	public void dispose () {
-		this.screenHandler.getCurrentScreen().dispose();
+		this.screenHandler.dispose();
 	}
 
 	@Override

@@ -5,11 +5,12 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.DefaultTimepiece;
 import com.badlogic.gdx.ai.GdxAI;
+import com.badlogic.gdx.utils.Disposable;
 import com.jam.game.Game;
 import com.jam.game.managers.FileManager;
 import com.jam.game.utils.enums.ScreenType;
 
-public class ScreenHandler {
+public class ScreenHandler implements Disposable {
 	
 	private Game g;
 	
@@ -72,5 +73,11 @@ public class ScreenHandler {
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public void dispose() {
+		getCurrentScreen().dispose();
+		this.manager.dispose();
 	}
 }

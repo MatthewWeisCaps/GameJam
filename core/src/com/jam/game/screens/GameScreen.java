@@ -47,6 +47,7 @@ import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
+import com.jam.game.utils.enums.PlatformType;
 import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
@@ -489,6 +490,9 @@ public class GameScreen implements CustomScreen {
 		
 		fileManager.loadAssets(textures, music);
 		
+		for (PlatformType p : PlatformType.values()) {
+			p.reset(null);
+		}
 	}
 
 }

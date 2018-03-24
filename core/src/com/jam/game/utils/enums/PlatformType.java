@@ -16,11 +16,16 @@ public enum PlatformType {
 	NUB((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)),
 	DEFAULT((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7));
 	
-	private final TextureRegion texture;
+	private /*final*/ TextureRegion texture;
 
 	
 	PlatformType(TextureRegion texture){
 		this.texture = texture;
+		System.err.println(texture.toString());
+	}
+	
+	public void reset(TextureRegion texture) {
+		this.texture = (TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
 	}
 	
 	public TextureRegion getTextureRegion() { return texture; }

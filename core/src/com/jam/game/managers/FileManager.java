@@ -5,11 +5,12 @@ import java.util.HashMap;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Disposable;
 import com.jam.game.utils.FileMapper;
 import com.jam.game.utils.Tuple;
 
 
-public class FileManager {
+public class FileManager implements Disposable {
 	
 	private HashMap<String, String> fileMap = new HashMap<String, String>();
 	public AssetManager manager;
@@ -22,14 +23,21 @@ public class FileManager {
 	
 	public void loadAssets(String[] textures, String[] music){
 		for(int i=0; i<music.length; i++){
-			this.manager.load(this.fileMap.get(music[i]), Music.class);
+			safeLoad(this.fileMap.get(music[i]), Music.class);
 		}	
 		
 		for(int i=0; i<textures.length; i++){
-			this.manager.load(this.fileMap.get(textures[i]), Texture.class);
+			safeLoad(this.fileMap.get(textures[i]), Texture.class);
 		}	
 		
 		this.manager.finishLoading();
+	}
+	
+	private <T> void safeLoad(String filename, Class<T> type) {
+		if (this.manager.getAssetNames().contains(filename, false)) {
+			this.manager.unload(filename);
+		}
+		this.manager.load(filename, type);
 	}
 	
 	public Music getMusicFile(String fileName){		
@@ -44,7 +52,8 @@ public class FileManager {
 		manager.clear();
 	}
 	
-	public void disposeAssets(){
+	@Override
+	public void dispose(){
 		manager.dispose();
 	}
 	
