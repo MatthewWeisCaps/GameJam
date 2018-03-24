@@ -1,6 +1,6 @@
 1) Re-factor the code...to much trash
 
-2) DO THE SCORE!
+2) DO THE SCORE! **DONE (not the font tho) **
 
 3) Have n types of hats that have different power ups
 
@@ -33,8 +33,8 @@ MECHS:
 	
 	4) Platform types:(Slowly introduce new platforms)
 		-Conveyor belt platforms 
-		-Oil Platforms 
-		-Moving platforms
+		-Oil Platforms **DONE**
+		-Moving platforms **DONE**
 		-Spike platforms
 	
 	5) Bats that hurt you

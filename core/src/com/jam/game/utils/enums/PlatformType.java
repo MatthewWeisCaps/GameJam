@@ -21,7 +21,6 @@ public enum PlatformType {
 	
 	PlatformType(TextureRegion texture){
 		this.texture = texture;
-		System.err.println(texture.toString());
 	}
 	
 	public void reset(TextureRegion texture) {
