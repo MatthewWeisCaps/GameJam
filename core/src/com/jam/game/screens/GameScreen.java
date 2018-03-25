@@ -34,7 +34,6 @@ import com.jam.game.components.TypeComponent;
 import com.jam.game.controllers.KeyboardController;
 import com.jam.game.levels.Level;
 import com.jam.game.managers.FileManager;
-import com.jam.game.systems.CollisionSystem;
 import com.jam.game.systems.DelayedRemovalSystem;
 import com.jam.game.systems.LevelSystem;
 import com.jam.game.systems.LightingSystem;
@@ -67,7 +66,7 @@ public class GameScreen implements CustomScreen {
 	
 	private Game game;
 	private UI ui;
-	
+		
 	public boolean playerDeath = false;
 	
 	public final static Texture TEXTURE = new Texture("full_sheet.png"); //TODO: Replace with respective stuff (Character sheet)
@@ -108,7 +107,7 @@ public class GameScreen implements CustomScreen {
 		//Add all relevant systems
 		engine.addSystem(renderingSystem);
 		engine.addSystem(new PhysicsSystem(world));
-		engine.addSystem(new CollisionSystem());
+//		engine.addSystem(new CollisionSystem());
 		
 		controller = new KeyboardController();
 		engine.addSystem(new PlayerControlSystem(controller, world, camera));

@@ -15,6 +15,7 @@ import com.jam.game.components.StateComponent;
 import com.jam.game.screens.GameScreen;
 import com.jam.game.systems.PhysicsSystem;
 import com.jam.game.utils.Mappers;
+import com.jam.game.utils.enums.PlatformType;
 
 public class Box2DContactListener implements ContactListener {
 
@@ -115,12 +116,24 @@ public class Box2DContactListener implements ContactListener {
 
 	@Override
 	public void endContact(Contact contact) {
-
+		
 	}
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
+		Entity e1 = (Entity) contact.getFixtureA().getBody().getUserData();
+		Entity e2 = (Entity) contact.getFixtureB().getBody().getUserData();
 		
+		if(e1 != null && e2 != null){
+			if(Mappers.platformMap.has(e1) || Mappers.platformMap.has(e2)){	
+				PlatformComponent platc = Mappers.platformMap.get(e1);
+				
+				if(platc == null) platc = Mappers.platformMap.get(e2);
+				
+				if(platc.getType() == PlatformType.CONVEYOR)
+					contact.setTangentSpeed(5.0f);		
+			}
+		}
 	}
 
 	@Override

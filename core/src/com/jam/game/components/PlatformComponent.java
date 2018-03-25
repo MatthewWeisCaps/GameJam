@@ -1,17 +1,24 @@
 package com.jam.game.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Rando;
 import com.jam.game.utils.enums.PlatformType;
 
+import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
+import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
+
 public class PlatformComponent implements Component, Poolable{
 	
-	private final float OIL_CHANCE = 0.25f;
+	private final float SPECIAL_CHANCE = 0.25f;
 	private final float MOVING_CHANCE = 0.50f;
+	private final PlatformType[] specialPlatformTypes = { PlatformType.OIL, PlatformType.CONVEYOR };
 	
 	public float x, y, width, height;
 	private Body body; // body associated w/ this platform
@@ -102,15 +109,14 @@ public class PlatformComponent implements Component, Poolable{
 			default:
 				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
 		}
-		//return this.type.getTextureRegion();
 	}
 
 	public PlatformType rollForPlatformType(){
 		PlatformType type = PlatformType.DEFAULT;
 		
 		if(Rando.coinFlip()){ //50% chance to roll for moving
-			if(Rando.getRandomNumber() <= OIL_CHANCE){
-				type = PlatformType.OIL;
+			if(Rando.getRandomNumber() <= SPECIAL_CHANCE){
+				type = this.specialPlatformTypes[Rando.getRandomBetweenInt(this.specialPlatformTypes.length)];
 			}
 		}else{
 			if(Rando.getRandomNumber() <= MOVING_CHANCE){
@@ -119,6 +125,91 @@ public class PlatformComponent implements Component, Poolable{
 		}
 		return type;
 	}
+	
+	public AnimatedBox2DSprite getPlatformAnimation(){
+		float aniSpeed = 0.075f;
+		Array<TextureRegion> regions;
+		AnimatedBox2DSprite sprite;
+		
+		switch(this.type){
+			case OIL:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			case MOVE:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			case DAMAGE:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			case NUB:
+				regions = new Array<TextureRegion>(3);
+				regions.setSize(3);
+				for(int i=1; i<=3; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), i*32, 3*32, 32, 32));
+				}
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+				sprite.setUseOrigin(false);
+				sprite.setScale(2.5f);
+				sprite.setPosition(0, 0);
+			
+				return sprite;
+			case WALL:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			case CONVEYOR:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			case DEFAULT:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+			default:
+				regions = new Array<TextureRegion>();
+				regions.setSize(1);
+				regions.set(0, this.getTextureRegion());
+				
+				regions.add(this.getTextureRegion());
+				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
+
+				return sprite;
+		}
+	}
+	
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub

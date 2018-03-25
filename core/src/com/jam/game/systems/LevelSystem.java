@@ -99,7 +99,6 @@ public class LevelSystem extends EntitySystem {
 				body.setGravityScale(0);
 				body.setLinearVelocity(new Vector2(0,0));
 				body.setLinearVelocity(pc.getDir() * pc.SPEED, Math.abs(body.getLinearVelocity().y));
-
 			}
 		}
 		
@@ -123,19 +122,20 @@ public class LevelSystem extends EntitySystem {
 				
 				final String def = "DEFAULT";
 				
-				if(plat.getType() != PlatformType.NUB){
-					Array<TextureRegion> one = new Array<TextureRegion>();
-					one.setSize(1);
-					one.set(0, plat.getTextureRegion());
-					
-					one.add(plat.getTextureRegion());
-					
-					animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-							new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-				}else{
-					animC.animations.put(def, PlatformType.NUB.getNubAnimation());
-				}
+//				if(plat.getType() != PlatformType.NUB){
+//					Array<TextureRegion> one = new Array<TextureRegion>();
+//					one.setSize(1);
+//					one.set(0, plat.getTextureRegion());
+//					
+//					one.add(plat.getTextureRegion());
+//					
+//					animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+//							new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+//				}else{
+//					animC.animations.put(def, plat.getPlatformAnimation());
+//				}
 				
+				animC.animations.put(def, plat.getPlatformAnimation());
 				animC.currentAnimation = def;
 				
 				platC = plat;

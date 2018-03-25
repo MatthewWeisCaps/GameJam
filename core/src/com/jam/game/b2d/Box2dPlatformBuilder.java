@@ -206,6 +206,22 @@ public class Box2dPlatformBuilder implements Disposable {
 		return builder;
 	}
 	
+	public static Box2dPlatformBuilder CONVEYOR(float width, float height){
+		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
+		
+		builder.setBodyType(BodyType.StaticBody);
+		builder.setBodyPosition(0, 0);
+		builder.setDensity(1.0f);
+		builder.setFriction(25.0f);
+		builder.setRestitution(0.0f);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, height);
+		builder.setShape(shape);
+			
+		return builder;
+	}
+	
 	public static Box2dPlatformBuilder NUB(float width, float height) {
 		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
 		
@@ -250,6 +266,11 @@ public class Box2dPlatformBuilder implements Disposable {
 				break;
 			case WALL:
 				builder = Box2dPlatformBuilder.WALL(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
+				break;
+			case CONVEYOR:
+				builder = Box2dPlatformBuilder.CONVEYOR(platform.width, platform.height);
 				f.categoryBits = Category.WALL.getValue();
 				f.maskBits = Mask.WALL.getValue();
 				break;
