@@ -10,25 +10,8 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedBox2DSprite;
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public enum PlatformType {
-	OIL((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0, 3*32, 32, 7)), 
-	MOVE((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)), 
-	DAMAGE((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)), 
-	NUB((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7)),
-	DEFAULT((TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7));
-	
-	private /*final*/ TextureRegion texture;
-
-	
-	PlatformType(TextureRegion texture){
-		this.texture = texture;
-	}
-	
-	public void reset(TextureRegion texture) {
-		this.texture = (TextureRegion) new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
-	}
-	
-	public TextureRegion getTextureRegion() { return texture; }
-	
+	OIL, MOVE, DAMAGE, NUB,WALL,DEFAULT;
+		
 	//It might be dirty...but it feels so good! (This is probs temp?)
 	public AnimatedBox2DSprite getNubAnimation(){
 		float aniSpeed = 0.075f;

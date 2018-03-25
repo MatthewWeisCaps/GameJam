@@ -361,8 +361,8 @@ public class GameScreen implements CustomScreen {
 		engine.addEntity(entity);
 		boxShape.dispose();
 		
-		createLeftWall();
-		createRightWall();
+//		createLeftWall();
+//		createRightWall();
 	}
 	
 	void createLeftWall() {		
@@ -488,9 +488,9 @@ public class GameScreen implements CustomScreen {
 		
 		fileManager.loadAssets(textures, music);
 		
-		for (PlatformType p : PlatformType.values()) {
-			p.reset(null);
-		}
+//		for (PlatformType p : PlatformType.values()) {
+//			p.reset(null);
+//		}
 	}
 
 }

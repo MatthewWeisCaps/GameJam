@@ -33,7 +33,7 @@ public class Level {
 	
 	public Entity[] walls;
 	
-	public float wallHeight = 10.0f;
+	public float wallHeight = GameScreen.VIRTUAL_HEIGHT + GameScreen.VIRTUAL_HEIGHT/2;//10.0f;
 	private float wallWidth = 2.0f;
 	
 	private float nubSize = 1.0f;
@@ -130,7 +130,7 @@ public class Level {
 		return p;
 	}
 	
-	public Body[] spawnLeftAndRightWalls(float y){
+	public PlatformComponent[] spawnLeftAndRightWalls(float y){
 		PlatformComponent[] walls = new PlatformComponent[2];
 		
 		//Left Wall:
@@ -144,10 +144,12 @@ public class Level {
 		walls[1].set(GameScreen.VIRTUAL_WIDTH, y, this.wallWidth, this.wallHeight);		
 		Body rBody = Box2dPlatformBuilder.DEFAULT(walls[1]).buildAndDispose(world); // add body to world and retrieve it
 		walls[1].setBody(rBody);
-				
-		return new Body[] {walls[0].getBody(), walls[1].getBody()};
+
+		//return new Body[] {walls[0].getBody(), walls[1].getBody()};
+		
+		return walls;
 	}
-	
+		
 	private int[] getPlatRowFromLast(boolean isFirstRow){
 		int[] newRow = new int[]{0,0,0};
 		
@@ -302,5 +304,4 @@ public class Level {
 	public Queue<PlatformComponent> getPlatformQueue() {
 		return queue;
 	}
-	
 }

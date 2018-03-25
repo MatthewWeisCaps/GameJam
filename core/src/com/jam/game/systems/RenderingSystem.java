@@ -100,13 +100,9 @@ public class RenderingSystem extends SortedIteratingSystem {
 				if (state.ropeJointDef != null) {
 					origin = state.ropeJointDef.bodyA.getWorldPoint(state.ropeJointDef.localAnchorA);
 					dest = state.ropeJointDef.bodyB.getWorldPoint(state.ropeJointDef.localAnchorB);
-				} else {
-					System.out.println("here");
-									
+				} else {	
 					origin = state.invalidThrowStart;
 					dest = state.invalidThrowEnd;
-					System.out.println(origin + "; " + dest);
-
 				}
 				
 				

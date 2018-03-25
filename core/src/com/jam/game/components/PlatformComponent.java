@@ -86,7 +86,23 @@ public class PlatformComponent implements Component, Poolable{
 	}
 	
 	public TextureRegion getTextureRegion(){
-		return this.type.getTextureRegion();
+		switch(this.type){
+			case OIL:
+				 return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0, 3*32, 32, 7);
+			case MOVE:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+			case DAMAGE:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+			case NUB:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+			case WALL:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+			case DEFAULT:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+			default:
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+		}
+		//return this.type.getTextureRegion();
 	}
 
 	public PlatformType rollForPlatformType(){

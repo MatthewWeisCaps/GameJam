@@ -158,6 +158,22 @@ public class Box2dPlatformBuilder implements Disposable {
 		return builder;
 	}
 	
+	public static Box2dPlatformBuilder WALL(float width, float height){
+		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
+		
+		builder.setBodyType(BodyType.DynamicBody);
+		builder.setBodyPosition(0, 0);
+		builder.setDensity(1.0f);
+		builder.setFriction(1.0f);
+		builder.setRestitution(0.0f);
+		
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(width, height);
+		builder.setShape(shape);
+			
+		return builder;
+	}
+	
 	public static Box2dPlatformBuilder SLICK(float width, float height){
 		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
 		
@@ -231,6 +247,11 @@ public class Box2dPlatformBuilder implements Disposable {
 				builder = Box2dPlatformBuilder.NUB(platform.width, platform.height);
 				f.categoryBits = Category.WALL_NUB.getValue();
 				f.maskBits = Mask.WALL_NUB.getValue();
+				break;
+			case WALL:
+				builder = Box2dPlatformBuilder.WALL(platform.width, platform.height);
+				f.categoryBits = Category.WALL.getValue();
+				f.maskBits = Mask.WALL.getValue();
 				break;
 			case DEFAULT:
 				builder = Box2dPlatformBuilder.DEFAULT(platform.width, platform.height);

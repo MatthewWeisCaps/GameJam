@@ -21,6 +21,7 @@ import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
 import com.jam.game.powerup.Powerup;
+import com.jam.game.utils.Mappers;
 import com.jam.game.utils.Rando;
 import com.jam.game.utils.enums.PlatformType;
 
@@ -36,6 +37,8 @@ public class LevelSystem extends EntitySystem {
 	private float camSpeedIncrease = 0.00001f;
 	private Level level;
 	
+	private Entity[] walls;
+	
 	private OrthographicCamera cam;
 	private float yHeight = 0.0f;
 	
@@ -46,6 +49,7 @@ public class LevelSystem extends EntitySystem {
 		this.level = level;
 		this.cam = cam;
 		
+		this.walls = new Entity[2];
 	}
 		
 	@Override
@@ -55,7 +59,12 @@ public class LevelSystem extends EntitySystem {
 		// calc new y
 		yHeight = calculateYHeight();//Math.max(calculateYHeight(), playerBody.getPosition().y);
 		
-		
+		if(this.walls[0] == null){
+			this.walls = this.createInitialWalls(yHeight);
+		}else{
+			this.updateWalls(yHeight);
+		}
+				
 		// move camera
 		cam.position.set(cam.position.x, yHeight, cam.position.z);
 		
@@ -168,6 +177,86 @@ public class LevelSystem extends EntitySystem {
 			}
 		} //end of spawning platforms		
 		
+	}
+	
+	private Entity[] createInitialWalls(float y){
+		PooledEngine engine = (PooledEngine)this.getEngine(); // ref engine
+		
+		Entity[] entities = new Entity[2];
+		entities[0] = engine.createEntity();
+		entities[1] = engine.createEntity();
+		
+		BodyComponent bodyC1 = engine.createComponent(BodyComponent.class);
+		BodyComponent bodyC2 = engine.createComponent(BodyComponent.class); 
+
+		AnimationComponent animC = engine.createComponent(AnimationComponent.class);
+		TransformComponent transC = engine.createComponent(TransformComponent.class);
+		
+		PlatformComponent platC1 = engine.createComponent(PlatformComponent.class);
+		PlatformComponent platC2 = engine.createComponent(PlatformComponent.class);
+
+		PlatformComponent[] walls = this.level.spawnLeftAndRightWalls(y);
+		
+		platC1 = walls[0];
+		platC2 = walls[1];
+		
+		bodyC1.b2dBody = platC1.getBody();
+		bodyC2.b2dBody = platC2.getBody();
+		
+		bodyC1.b2dBody.setUserData(entities[0]);
+		bodyC2.b2dBody.setUserData(entities[1]);
+				
+		final String def = "DEFAULT";
+		
+		Array<TextureRegion> one = new Array<TextureRegion>();
+		one.setSize(1);
+		one.set(0, platC1.getTextureRegion());
+		
+		one.add(platC1.getTextureRegion());
+		
+		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
+				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
+		
+		animC.currentAnimation = def;
+		
+		
+		entities[0].add(bodyC1);
+		entities[0].add(animC);
+		entities[0].add(transC);
+		entities[0].add(platC1);
+		
+		entities[1].add(bodyC2);
+		entities[1].add(animC);
+		entities[1].add(transC);
+		entities[1].add(platC2);
+		
+		engine.addEntity(entities[0]);
+		engine.addEntity(entities[1]);
+		
+		return entities;
+	}
+	
+	private void updateWalls(float y){
+		FitViewport viewport = this.getEngine().getSystem(RenderingSystem.class).getViewport();
+
+		PlatformComponent lWallPC = Mappers.platformMap.get(this.walls[0]);
+		PlatformComponent rWallPC = Mappers.platformMap.get(this.walls[1]);
+		
+		Body b1 = lWallPC.getBody();
+		Body b2 = rWallPC.getBody();
+		
+		Vector3 coords3D = cam.project(new Vector3(b1.getPosition(), 0.0f), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
+		
+		b1.setGravityScale(0);
+		b1.setLinearVelocity(new Vector2(0,0));
+		
+		b2.setGravityScale(0);
+		b2.setLinearVelocity(new Vector2(0,0));
+		
+		if(coords3D.y - lWallPC.height/2 < y){
+			b1.setTransform(0, y, 0);
+			b2.setTransform(rWallPC.x, y, 0);
+		}
 	}
 	
 	public float getYHeight() {
