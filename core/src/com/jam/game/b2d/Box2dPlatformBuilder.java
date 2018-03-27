@@ -110,7 +110,7 @@ public class Box2dPlatformBuilder implements Disposable {
 	public Box2dPlatformBuilder setFrictionBasedOnSpecialType(PlatformType t){
 		switch(t){
 			case CONVEYOR:
-				b2dFixture.friction = 10.0f;
+				b2dFixture.friction = 20.0f;
 				return this;
 			case OIL:
 				b2dFixture.friction = 0.05f;
