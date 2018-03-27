@@ -80,7 +80,7 @@ public class Box2DContactListener implements ContactListener {
 					player = Mappers.playerMap.get(e1);
 				}
 				
-				player.setOnPlatType(pc.getType());
+				player.setOnPlatType(pc.getTrueType());
 			}
 		}
 		
@@ -130,8 +130,8 @@ public class Box2DContactListener implements ContactListener {
 				
 				if(platc == null) platc = Mappers.platformMap.get(e2);
 				
-				if(platc.getType() == PlatformType.CONVEYOR)
-					contact.setTangentSpeed(5.0f);		
+				if(platc.getTrueType() == PlatformType.CONVEYOR)
+					contact.setTangentSpeed(50.0f);		
 			}
 		}
 	}

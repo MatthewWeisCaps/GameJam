@@ -208,15 +208,7 @@ public class LevelSystem extends EntitySystem {
 				
 		final String def = "DEFAULT";
 		
-		Array<TextureRegion> one = new Array<TextureRegion>();
-		one.setSize(1);
-		one.set(0, platC1.getTextureRegion());
-		
-		one.add(platC1.getTextureRegion());
-		
-		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-		
+		animC.animations.put(def, platC1.getPlatformAnimation());
 		animC.currentAnimation = def;
 		
 		

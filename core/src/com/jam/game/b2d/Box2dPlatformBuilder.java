@@ -14,6 +14,7 @@ import com.jam.game.components.PlatformComponent;
 import com.jam.game.powerup.Powerup;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
+import com.jam.game.utils.enums.PlatformType;
 
 /*
  * Builder for platforms.
@@ -106,6 +107,20 @@ public class Box2dPlatformBuilder implements Disposable {
 		return this;
 	}
 	
+	public Box2dPlatformBuilder setFrictionBasedOnSpecialType(PlatformType t){
+		switch(t){
+			case CONVEYOR:
+				b2dFixture.friction = 10.0f;
+				return this;
+			case OIL:
+				b2dFixture.friction = 0.05f;
+				return this;
+			default:
+				b2dFixture.friction = 1.0f;
+				return this;
+		}
+	}
+	
 	/*
 	 * Build method. Disposes of shape, not body.
 	 */
@@ -190,13 +205,14 @@ public class Box2dPlatformBuilder implements Disposable {
 		return builder;
 	}
 	
-	public static Box2dPlatformBuilder MOVING(float width, float height){
+	public static Box2dPlatformBuilder MOVING(float width, float height, PlatformType secondType){
 		Box2dPlatformBuilder builder = new Box2dPlatformBuilder();
 		
 		builder.setBodyType(BodyType.DynamicBody);
 		builder.setBodyPosition(0, 0);
 		builder.setDensity(9999.0f);
-		builder.setFriction(1.0f);
+		//builder.setFriction(1.0f);
+		builder.setFrictionBasedOnSpecialType(secondType);
 		builder.setRestitution(0.0f);
 		
 		PolygonShape shape = new PolygonShape();
@@ -212,7 +228,7 @@ public class Box2dPlatformBuilder implements Disposable {
 		builder.setBodyType(BodyType.StaticBody);
 		builder.setBodyPosition(0, 0);
 		builder.setDensity(1.0f);
-		builder.setFriction(25.0f);
+		builder.setFriction(200.0f);
 		builder.setRestitution(0.0f);
 		
 		PolygonShape shape = new PolygonShape();
@@ -255,7 +271,7 @@ public class Box2dPlatformBuilder implements Disposable {
 				f.maskBits = Mask.WALL.getValue();
 				break;
 			case MOVE:
-				builder = Box2dPlatformBuilder.MOVING(platform.width, platform.height);
+				builder = Box2dPlatformBuilder.MOVING(platform.width, platform.height, platform.getTrueType());
 				f.categoryBits = Category.WALL.getValue();
 				f.maskBits = Mask.WALL.getValue();
 				break;

@@ -16,8 +16,10 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class PlatformComponent implements Component, Poolable{
 	
-	private final float SPECIAL_CHANCE = 0.25f;
+	private final float SPECIAL_CHANCE = 1.25f;
 	private final float MOVING_CHANCE = 0.50f;
+	private final float SECOND_TYPE_CHANCE = 0.45f;
+	
 	private final PlatformType[] specialPlatformTypes = { PlatformType.OIL, PlatformType.CONVEYOR };
 	
 	public float x, y, width, height;
@@ -26,6 +28,8 @@ public class PlatformComponent implements Component, Poolable{
 	private int dir = 0; //Used only for moving platforms
 	public final float SPEED = 2.0f;
 	private PlatformType type;
+	
+	private PlatformType secondType; //TODO: Make it so moving (or others that are implemented) can have a second type like conveyor to make game harder
 		
 	public PlatformComponent() {
 		this(0.0f, 0.0f, 0.0f, 0.0f);
@@ -59,12 +63,6 @@ public class PlatformComponent implements Component, Poolable{
 			this.dir = Rando.coinFlip() ? 1 : -1;
 		}
 	}
-
-	public void checkChangeDir(float x){	
-		if(x - this.width - this.width/2 <= 0 || x  +this.width + this.width/2 >= GameScreen.VIRTUAL_WIDTH){
-			this.changeDir();
-		}
-	}
 	
 	public Body getBody() {
 		return body;
@@ -87,6 +85,10 @@ public class PlatformComponent implements Component, Poolable{
 		return this.type;
 	}
 	
+	public PlatformType getTrueType(){
+		return this.secondType != null ? this.secondType : this.type;
+	}
+	
 	//temp
 	public void setType(PlatformType type){
 		this.type = type;
@@ -103,11 +105,11 @@ public class PlatformComponent implements Component, Poolable{
 			case NUB:
 				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
 			case WALL:
-				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0, 0, 32, 8);
 			case DEFAULT:
 				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
 			default:
-				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 2*32, 0, 32, 7);
+				return new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0, 0, 32, 8);
 		}
 	}
 
@@ -123,6 +125,13 @@ public class PlatformComponent implements Component, Poolable{
 				type = PlatformType.MOVE;
 			}
 		}
+		
+		if(type == PlatformType.MOVE){
+			if(Rando.getRandomNumber() <= SECOND_TYPE_CHANCE){
+				secondType = this.specialPlatformTypes[Rando.getRandomBetweenInt(this.specialPlatformTypes.length)];
+			}
+		}
+		
 		return type;
 	}
 	
@@ -131,22 +140,40 @@ public class PlatformComponent implements Component, Poolable{
 		Array<TextureRegion> regions;
 		AnimatedBox2DSprite sprite;
 		
-		switch(this.type){
+		PlatformType t = this.type;
+		
+		if(this.secondType != null)
+			t = this.secondType;
+		
+		switch(t){
 			case OIL:
 				regions = new Array<TextureRegion>();
-				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
 				
-				regions.add(this.getTextureRegion());
+				int extraWait = Rando.getRandomBetweenInt(40);
+				
+				regions.setSize(8 + extraWait);
+				for(int i=1; i<=8 + extraWait; i++){
+					if(i > 8){
+						regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), 0*32, 2*32, 32, 32));
+					}else{
+						regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 2*32, 32, 32));
+					}
+				}
+				
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
-
+				
+				sprite.setUseOrigin(false);
+				sprite.setScale(1, 4.0f);
+				sprite.setPosition(0, -1.75f);
+				
 				return sprite;
 			case MOVE:
 				regions = new Array<TextureRegion>();
 				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
 				
-				regions.add(this.getTextureRegion());
+				for(int i=1; i<=1; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 0*32, 32, 8));
+				}
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 
 				return sprite;
@@ -163,7 +190,7 @@ public class PlatformComponent implements Component, Poolable{
 				regions = new Array<TextureRegion>(3);
 				regions.setSize(3);
 				for(int i=1; i<=3; i++){
-					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), i*32, 3*32, 32, 32));
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 3*32, 32, 32));
 				}
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 				sprite.setUseOrigin(false);
@@ -174,36 +201,40 @@ public class PlatformComponent implements Component, Poolable{
 			case WALL:
 				regions = new Array<TextureRegion>();
 				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
 				
-				regions.add(this.getTextureRegion());
+				for(int i=1; i<=1; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 0*32, 32, 8));
+				}
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 
 				return sprite;
 			case CONVEYOR:
 				regions = new Array<TextureRegion>();
-				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
+				regions.setSize(6);
+				for(int i=1; i<=6; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 1*32, 32, 6));
+				}
 				
-				regions.add(this.getTextureRegion());
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 
 				return sprite;
 			case DEFAULT:
 				regions = new Array<TextureRegion>();
 				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
 				
-				regions.add(this.getTextureRegion());
+				for(int i=1; i<=1; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 0*32, 32, 8));
+				}
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 
 				return sprite;
 			default:
 				regions = new Array<TextureRegion>();
 				regions.setSize(1);
-				regions.set(0, this.getTextureRegion());
 				
-				regions.add(this.getTextureRegion());
+				for(int i=1; i<=1; i++){
+					regions.set(i-1, new TextureRegion(GameScreen.fileManager.getTextureFile("platforms"), (i-1)*32, 0*32, 32, 8));
+				}
 				sprite = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 
 				return sprite;
