@@ -11,10 +11,12 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -95,7 +97,7 @@ public class GameScreen implements CustomScreen {
 		gameMusic.play();
 		gameMusic.setLooping(true);
 		
-		world = new World(new Vector2(0, -20f), true);
+		world = new World(new Vector2(0, -20*0.80f), true);
 				
 		sb = new SpriteBatch();
 		//Create our rendering system
@@ -176,7 +178,6 @@ public class GameScreen implements CustomScreen {
 		TransformComponent pos = engine.createComponent(TransformComponent.class);
 		AnimationComponent anim = engine.createComponent(AnimationComponent.class);
 		PlayerComponent player = engine.createComponent(PlayerComponent.class);
-		TypeComponent t = engine.createComponent(TypeComponent.class);
 		StateComponent st = engine.createComponent(StateComponent.class);
 		
 		BodyDef playerBodyDef = new BodyDef();
@@ -185,12 +186,16 @@ public class GameScreen implements CustomScreen {
 		playerBodyDef.fixedRotation = true;
 		
 		body.b2dBody = world.createBody(playerBodyDef);
+		
+		float sidePanelWOffset = 0.3f; // on both sides
+		float sidePanelHOffset = 0.05f; // off ground only
+		
+		// make main body of player
 		FixtureDef playerFixture = new FixtureDef();
-		
 		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(UNIT/2.5f, UNIT/1.25f);
-		
-		
+		Rectangle r = new Rectangle(sidePanelWOffset, 0, (2.0f*(UNIT/2.5f))-(2*sidePanelWOffset), 2.0f*(UNIT/1.25f));
+		Vector2 outVec = new Vector2(0, 0);
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
 		playerFixture.friction = 1.0f;
@@ -198,10 +203,28 @@ public class GameScreen implements CustomScreen {
 		playerFixture.filter.maskBits = Mask.PLAYER.getValue();
 		body.b2dBody.createFixture(playerFixture);
 		
-		body.b2dBody.setUserData(TypeComponent.PLAYER);
+		// side panels
+		FixtureDef leftSidePanel = new FixtureDef();
+		r = new Rectangle(0, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
+		leftSidePanel.shape = boxShape;
+		leftSidePanel.restitution = 0.1f;
+		leftSidePanel.friction = 0.0f;
+		leftSidePanel.filter.categoryBits = Category.PLAYER.getValue();
+		leftSidePanel.filter.maskBits = Mask.PLAYER.getValue();
+		body.b2dBody.createFixture(leftSidePanel);
+		
+		FixtureDef rightSidePanel = new FixtureDef();
+		r = new Rectangle((2.0f*(UNIT/2.5f))-sidePanelWOffset, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
+		rightSidePanel.shape = boxShape;
+		rightSidePanel.restitution = 0.1f;
+		rightSidePanel.friction = 0.0f;
+		rightSidePanel.filter.categoryBits = Category.PLAYER.getValue();
+		rightSidePanel.filter.maskBits = Mask.PLAYER.getValue();
+		body.b2dBody.createFixture(rightSidePanel);
 		
 		pos.pos.set(0,0,0);
-		t.type = TypeComponent.PLAYER;
 		st.set(StateComponent.STATE_NORMAL);
 				
 		setPlayerAnimations(anim);
@@ -212,7 +235,6 @@ public class GameScreen implements CustomScreen {
 		entity.add(pos);
 		entity.add(anim);
 		entity.add(player);
-		entity.add(t);
 		entity.add(st);
 		
 		engine.addEntity(entity);

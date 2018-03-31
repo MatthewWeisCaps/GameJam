@@ -17,6 +17,8 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.jam.game.components.BodyComponent;
 
+import box2dLight.Light;
+
 
 public class DelayedRemovalSystem extends EntitySystem {
 	
@@ -26,6 +28,7 @@ public class DelayedRemovalSystem extends EntitySystem {
 	private ObjectSet<EntityActionTuple> pendingEntityRemovals = new ObjectSet<EntityActionTuple>();
 	private ObjectSet<Body> pendingBodyRemovals = new ObjectSet<Body>();
 	private ObjectSet<Joint> pendingJointRemovals = new ObjectSet<Joint>();
+	private ObjectSet<Light> pendingLightRemovals = new ObjectSet<Light>();
 	
 	public DelayedRemovalSystem(World world) {
 		super(Priority.POST_PHYSICS.PRIORITY);//.POST_PHYSICS.PRIORITY); // this should go off after the physics engine but before rendering
@@ -39,7 +42,8 @@ public class DelayedRemovalSystem extends EntitySystem {
 	@Override
 	public boolean checkProcessing() {
 		//return (pendingEntityRemovals.first() == null && pendingBodyRemovals.first() == null && pendingJointRemovals.first() == null);
-		return (pendingEntityRemovals.size > 0 || pendingBodyRemovals.size > 0 || pendingJointRemovals.size > 0);
+		return (pendingEntityRemovals.size > 0 || pendingBodyRemovals.size > 0 ||
+				pendingJointRemovals.size > 0 || pendingLightRemovals.size > 0);
 	}
 	
 	@Override
@@ -54,6 +58,12 @@ public class DelayedRemovalSystem extends EntitySystem {
 		Iterator<Body> bodyIter = pendingBodyRemovals.iterator();
 		while (bodyIter.hasNext()) {
 			world.destroyBody(bodyIter.next());
+		}
+		
+		// destroy pending lights
+		Iterator<Light> lightIter = pendingLightRemovals.iterator();
+		while (lightIter.hasNext()) {
+			lightIter.next().remove();
 		}
 		
 		// destroy pending entities
@@ -97,6 +107,7 @@ public class DelayedRemovalSystem extends EntitySystem {
 		pendingEntityRemovals.clear();
 		pendingBodyRemovals.clear();
 		pendingJointRemovals.clear();
+		pendingLightRemovals.clear();
 	}
 	
 	public boolean scheduleForRemoval(Entity entity) {
@@ -116,6 +127,10 @@ public class DelayedRemovalSystem extends EntitySystem {
 	
 	public boolean scheduleForRemoval(Joint joint) {
 		return pendingJointRemovals.add(joint);
+	}
+	
+	public boolean scheduleForRemoval(Light light) {
+		return pendingLightRemovals.add(light);
 	}
 	
 	/*
