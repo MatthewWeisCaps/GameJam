@@ -226,7 +226,7 @@ public class PlayerControlSystem extends IteratingSystem {
 			Vector3 coords3D = cam.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0), viewport.getScreenX(), viewport.getScreenY(), viewport.getScreenWidth(), viewport.getScreenHeight());
 			Vector2 coords = new Vector2(coords3D.x, coords3D.y);
 					
-			Box2DRaycastCallback callback = new Box2DRaycastCallback();
+			Box2DRaycastCallback callback = new Box2DRaycastCallback(body.b2dBody);
 			world.rayCast(callback, body.b2dBody.getPosition(), coords);
 			
 			

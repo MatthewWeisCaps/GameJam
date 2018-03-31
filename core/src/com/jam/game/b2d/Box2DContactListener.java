@@ -45,7 +45,8 @@ public class Box2DContactListener implements ContactListener {
 				
 				BodyComponent b = Mappers.bodyMap.get(e1);
 				
-				puc.powerup.removeLightSystem();
+				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.light);
+				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.getBody());
 				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
 				GameScreen.removalSystem.scheduleForRemoval(e1);
 				
@@ -57,7 +58,8 @@ public class Box2DContactListener implements ContactListener {
 				
 				BodyComponent b = Mappers.bodyMap.get(e2);
 				
-				puc.powerup.removeLightSystem();
+				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.light);
+				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.getBody());
 				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
 				GameScreen.removalSystem.scheduleForRemoval(e2);
 

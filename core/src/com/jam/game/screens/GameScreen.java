@@ -97,7 +97,7 @@ public class GameScreen implements CustomScreen {
 		gameMusic.play();
 		gameMusic.setLooping(true);
 		
-		world = new World(new Vector2(0, -20*0.80f), true);
+		world = new World(new Vector2(0, -20*0.90f), true);
 				
 		sb = new SpriteBatch();
 		//Create our rendering system

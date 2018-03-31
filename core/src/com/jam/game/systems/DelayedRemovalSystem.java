@@ -118,18 +118,22 @@ public class DelayedRemovalSystem extends EntitySystem {
 	 * action is a custom function which is called right before removing this entity
 	 */
 	public boolean scheduleForRemoval(Entity entity, Consumer<Entity> action) {
+		if (entity == null) return false;
 		return pendingEntityRemovals.add(new EntityActionTuple(entity, action));
 	}
 	
 	public boolean scheduleForRemoval(Body body) {
+		if (body == null) return false;
 		return pendingBodyRemovals.add(body);
 	}
 	
 	public boolean scheduleForRemoval(Joint joint) {
+		if (joint == null) return false;
 		return pendingJointRemovals.add(joint);
 	}
 	
 	public boolean scheduleForRemoval(Light light) {
+		if (light == null) return false;
 		return pendingLightRemovals.add(light);
 	}
 	
