@@ -10,7 +10,7 @@ public class KeyboardController {
 	public boolean jump = false;
 
 	public void checkInput() {
-		jump = Gdx.input.isKeyJustPressed(Keys.W) || Gdx.input.isKeyJustPressed(Keys.SPACE);
+		jump = Gdx.input.isKeyJustPressed(Keys.W)   || Gdx.input.isKeyJustPressed(Keys.SPACE);
 
 		left = Gdx.input.isKeyPressed(Keys.A);
 

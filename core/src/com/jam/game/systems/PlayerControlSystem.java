@@ -247,7 +247,6 @@ public class PlayerControlSystem extends IteratingSystem {
 				
 				jointDef.localAnchorA.set(Vector2.Zero);
 				jointDef.localAnchorB.set(callback.fixture.getBody().getLocalPoint(callback.point));
-
 				
 				// make length of rope equal to dist between player and fixture when rope is thrown (to avoid awkward drop-off)
 				final float distance = jointDef.bodyA.getWorldPoint(jointDef.localAnchorA).dst(jointDef.bodyB.getWorldPoint(jointDef.localAnchorB));

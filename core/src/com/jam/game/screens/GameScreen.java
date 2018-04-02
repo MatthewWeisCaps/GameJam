@@ -97,7 +97,7 @@ public class GameScreen implements CustomScreen {
 		gameMusic.play();
 		gameMusic.setLooping(true);
 		
-		world = new World(new Vector2(0, -20*0.90f), true);
+		world = new World(new Vector2(0, -20), true);
 				
 		sb = new SpriteBatch();
 		//Create our rendering system
@@ -137,7 +137,7 @@ public class GameScreen implements CustomScreen {
 	@Override
 	public void render(float delta) {
 		engine.update(delta);
-//		b2dRenderer.render(world, camera.combined);
+		b2dRenderer.render(world, camera.combined);
 		
 		this.ui.draw();
 	}
@@ -187,15 +187,16 @@ public class GameScreen implements CustomScreen {
 		
 		body.b2dBody = world.createBody(playerBodyDef);
 		
-		float sidePanelWOffset = 0.3f; // on both sides
-		float sidePanelHOffset = 0.05f; // off ground only
+		float sidePanelWOffset = 0.00003f; // on both sides (NOTE: This may be too small and cause errors)
+		float sidePanelHOffset = 0.3f; // off ground only
 		
 		// make main body of player
 		FixtureDef playerFixture = new FixtureDef();
 		PolygonShape boxShape = new PolygonShape();
 		Rectangle r = new Rectangle(sidePanelWOffset, 0, (2.0f*(UNIT/2.5f))-(2*sidePanelWOffset), 2.0f*(UNIT/1.25f));
-		Vector2 outVec = new Vector2(0, 0);
-		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
+//		Vector2 outVec = new Vector2(0, 0);
+		
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f); 
 		playerFixture.shape = boxShape;
 		playerFixture.restitution = 0.0f;
 		playerFixture.friction = 1.0f;
@@ -206,7 +207,7 @@ public class GameScreen implements CustomScreen {
 		// side panels
 		FixtureDef leftSidePanel = new FixtureDef();
 		r = new Rectangle(0, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
-		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, new Vector2(-1.0f, 0.0f), 0.0f);
 		leftSidePanel.shape = boxShape;
 		leftSidePanel.restitution = 0.1f;
 		leftSidePanel.friction = 0.0f;
@@ -215,8 +216,9 @@ public class GameScreen implements CustomScreen {
 		body.b2dBody.createFixture(leftSidePanel);
 		
 		FixtureDef rightSidePanel = new FixtureDef();
-		r = new Rectangle((2.0f*(UNIT/2.5f))-sidePanelWOffset, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
-		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, r.getCenter(outVec), 0.0f);
+		//r = new Rectangle((2.0f*(UNIT/2.5f))-sidePanelWOffset, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
+		r = new Rectangle(-sidePanelWOffset, sidePanelHOffset, sidePanelWOffset, 2.0f*(UNIT/1.25f)-sidePanelHOffset);
+		boxShape.setAsBox(r.getWidth()/2.0f, r.getHeight()/2.0f, new Vector2(1.0f, 0.0f), 0.0f);
 		rightSidePanel.shape = boxShape;
 		rightSidePanel.restitution = 0.1f;
 		rightSidePanel.friction = 0.0f;
@@ -381,90 +383,8 @@ public class GameScreen implements CustomScreen {
 		
 		engine.addEntity(entity);
 		boxShape.dispose();
-		
-//		createLeftWall();
-//		createRightWall();
 	}
 	
-	void createLeftWall() {		
-		Entity entity = engine.createEntity();
-		
-		BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
-		AnimationComponent animC = engine.createComponent(AnimationComponent.class);
-		TransformComponent transC = engine.createComponent(TransformComponent.class);
-		PlatformComponent platC = engine.createComponent(PlatformComponent.class);
-		
-		PlatformComponent pc = new PlatformComponent();
-		
-		pc.set(0, 70, UNIT, 100);
-		
-		Body body = Box2dPlatformBuilder.DEFAULT(pc).buildAndDispose(world); // add body to world and retrieve it
-		pc.setBody(body);
-		
-		bodyC.b2dBody = pc.getBody();
-		bodyC.b2dBody.setUserData(entity);
-		
-		Array<TextureRegion> one = new Array<TextureRegion>();
-		one.setSize(1);
-		one.set(0, pc.getTextureRegion());
-		
-		one.add(pc.getTextureRegion());
-		
-		final String def = "DEFAULT";
-		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-		animC.currentAnimation = def;
-		
-		platC = pc;
-		
-		entity.add(bodyC);
-		entity.add(animC);
-		entity.add(transC);
-		entity.add(platC);
-		
-		engine.addEntity(entity);
-	}
-	
-	void createRightWall() {
-		Entity entity = engine.createEntity();
-		
-		BodyComponent bodyC = engine.createComponent(BodyComponent.class); // make components
-		AnimationComponent animC = engine.createComponent(AnimationComponent.class);
-		TransformComponent transC = engine.createComponent(TransformComponent.class);
-		PlatformComponent platC = engine.createComponent(PlatformComponent.class);
-		
-		PlatformComponent pc = new PlatformComponent();
-		
-		pc.set(VIRTUAL_WIDTH, 70, UNIT, 100);
-		
-		Body body = Box2dPlatformBuilder.DEFAULT(pc).buildAndDispose(world); // add body to world and retrieve it
-		pc.setBody(body);
-		
-		bodyC.b2dBody = pc.getBody();
-		bodyC.b2dBody.setUserData(entity);
-		
-		Array<TextureRegion> one = new Array<TextureRegion>();
-		one.setSize(1);
-		one.set(0, pc.getTextureRegion());
-		
-		one.add(pc.getTextureRegion());
-		
-		final String def = "DEFAULT";
-		animC.animations.put(def, new AnimatedBox2DSprite(new AnimatedSprite(
-				new Animation<TextureRegion>(0.0f, one, PlayMode.NORMAL))));
-		animC.currentAnimation = def;
-		
-		platC = pc;
-		
-		entity.add(bodyC);
-		entity.add(animC);
-		entity.add(transC);
-		entity.add(platC);
-		
-		engine.addEntity(entity);
-	}
-	
-
 	public void listener() {
 		
 	}

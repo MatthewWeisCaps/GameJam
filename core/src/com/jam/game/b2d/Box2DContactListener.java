@@ -47,7 +47,7 @@ public class Box2DContactListener implements ContactListener {
 				
 				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.light);
 				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.getBody());
-				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
+				//GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
 				GameScreen.removalSystem.scheduleForRemoval(e1);
 				
 			}else if(Mappers.powerupMap.has(e2) && Mappers.playerMap.has(e1)){
@@ -60,7 +60,7 @@ public class Box2DContactListener implements ContactListener {
 				
 				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.light);
 				GameScreen.removalSystem.scheduleForRemoval(puc.powerup.getBody());
-				GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
+				//GameScreen.removalSystem.scheduleForRemoval(b.b2dBody);
 				GameScreen.removalSystem.scheduleForRemoval(e2);
 
 				
@@ -127,13 +127,18 @@ public class Box2DContactListener implements ContactListener {
 		Entity e2 = (Entity) contact.getFixtureB().getBody().getUserData();
 		
 		if(e1 != null && e2 != null){
-			if(Mappers.platformMap.has(e1) || Mappers.platformMap.has(e2)){	
+			if((Mappers.platformMap.has(e1) || Mappers.platformMap.has(e2)) && (Mappers.stateMap.has(e1) || Mappers.stateMap.has(e2))){	
 				PlatformComponent platc = Mappers.platformMap.get(e1);
+				StateComponent state = Mappers.stateMap.get(e2);
 				
-				if(platc == null) platc = Mappers.platformMap.get(e2);
+				if(platc == null){
+					platc = Mappers.platformMap.get(e2);
+					state = Mappers.stateMap.get(e1);
+				}
 				
-				if(platc.getTrueType() == PlatformType.CONVEYOR)
+				if(platc.getTrueType() == PlatformType.CONVEYOR && !state.isSwinging){
 					contact.setTangentSpeed(50.0f);		
+				}
 			}
 		}
 	}
