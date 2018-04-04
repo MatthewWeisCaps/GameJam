@@ -137,7 +137,7 @@ public class GameScreen implements CustomScreen {
 	@Override
 	public void render(float delta) {
 		engine.update(delta);
-		b2dRenderer.render(world, camera.combined);
+//		b2dRenderer.render(world, camera.combined);
 		
 		this.ui.draw();
 	}

@@ -16,7 +16,7 @@ import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
 public class PlatformComponent implements Component, Poolable{
 	
-	private final float SPECIAL_CHANCE = 1.25f;
+	private final float SPECIAL_CHANCE = 0.35f;
 	private final float MOVING_CHANCE = 0.50f;
 	private final float SECOND_TYPE_CHANCE = 0.45f;
 	

@@ -12,8 +12,8 @@ public class PlayerComponent implements Component, Poolable {
 
 	public KeyboardController controller = new KeyboardController();
 	
-	private final float MIN_DIST = 10;
-	private final float MAX_DIST = 75; //Was 100
+	private final float MIN_DIST = 15; //Was 10
+	private final float MAX_DIST = 90; //Was 100
 	
 	public boolean lightPowerupEnabled = false;
 	public float max_powerupTime = 100.0f;
@@ -21,7 +21,7 @@ public class PlayerComponent implements Component, Poolable {
 	public float powerupBonusValue = 0.15f;
 	public final float reduceTime = 0.25f;
 	
-	public float distSubValue = -0.1f; //was -0.05
+	public float distSubValue = -0.075f; //was -0.05
 	public float distAddValue = 0.30f; //was .40
 	public float dist = 40.0f;
 	
