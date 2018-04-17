@@ -45,6 +45,7 @@ import com.jam.game.systems.PlayerSystem;
 import com.jam.game.systems.RenderingSystem;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.PlayerAnims;
+import com.jam.game.utils.Rando;
 import com.jam.game.utils.enums.Category;
 import com.jam.game.utils.enums.Mask;
 import com.jam.game.utils.enums.PlatformType;
@@ -75,7 +76,7 @@ public class GameScreen implements CustomScreen {
 	
 	//public final static Texture PLATFORM_TEXTURE = new Texture("platform/platforms_ALL.png");
 	
-	Music gameMusic = Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music.mp3"));
+	Music gameMusic = Rando.coinFlip() ? Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music.mp3")) : Gdx.audio.newMusic(Gdx.files.internal("sounds/gameplay_music_2.mp3"));
 	
 	World world;
 	PooledEngine engine;
@@ -136,7 +137,12 @@ public class GameScreen implements CustomScreen {
 		
 	@Override
 	public void render(float delta) {
-		engine.update(delta);
+		if(!Game.getScreenHandler().isPaused){
+			engine.update(delta);
+		}else{
+			engine.getSystem(RenderingSystem.class).update(delta);
+			engine.getSystem(LightingSystem.class).update(delta);
+		}
 //		b2dRenderer.render(world, camera.combined);
 		
 		this.ui.draw();

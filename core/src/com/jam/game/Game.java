@@ -14,8 +14,8 @@ public class Game implements ApplicationListener {
 	private static ScreenHandler screenHandler;
 	
 	public void moveToNextScreen(ScreenType screen){
-		this.screenHandler.moveToScreenAndDispose(screen);
-		this.screenHandler.showCurrentScreen();
+		screenHandler.moveToScreenAndDispose(screen);
+		screenHandler.showCurrentScreen();
 	}
 	
 	@Override
@@ -26,33 +26,36 @@ public class Game implements ApplicationListener {
 	@Override
 	public void render () {
 		if(Gdx.input.isKeyJustPressed(Keys.ESCAPE))
+//			screenHandler.pauseCurrentScreen();
 			Gdx.app.exit();
 		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		GdxAI.getTimepiece().update(Gdx.graphics.getDeltaTime());
-		this.screenHandler.getCurrentScreen().render(GdxAI.getTimepiece().getDeltaTime());
+		screenHandler.getCurrentScreen().render(GdxAI.getTimepiece().getDeltaTime());
+		
+		screenHandler.tryShowPauseScreen(GdxAI.getTimepiece().getDeltaTime());
 	}
 	
 	@Override
 	public void dispose () {
-		this.screenHandler.dispose();
+		screenHandler.dispose();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		this.screenHandler.getCurrentScreen().resize(width, height);
+		screenHandler.getCurrentScreen().resize(width, height);
 	}
 
 	@Override
 	public void pause() {
-		this.screenHandler.getCurrentScreen().pause();
+		screenHandler.getCurrentScreen().pause();
 	}
 
 	@Override
 	public void resume() {
-		this.screenHandler.getCurrentScreen().resume();
+		screenHandler.getCurrentScreen().resume();
 	}
 	
 	public static ScreenHandler getScreenHandler(){

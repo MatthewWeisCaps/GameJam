@@ -1,7 +1,8 @@
 package com.jam.game.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,35 +19,55 @@ import com.jam.game.utils.enums.ScreenType;
 
 import net.dermetfan.gdx.graphics.g2d.AnimatedSprite;
 
-public class PauseScreen implements CustomScreen{
-	public final static int VIRTUAL_WIDTH = 32;
-	public final static int VIRTUAL_HEIGHT = 32;
-
+public class SplashScreen implements CustomScreen{
 	private Game game;
+	
+	public final static int VIRTUAL_WIDTH = 96;
+	public final static int VIRTUAL_HEIGHT = 96;
+	
 	private FileManager fileManager;
-			
+	
+//	private Music song;
+	private Music soundEfct;
+	
 	OrthographicCamera camera;
     FitViewport viewport;
     SpriteBatch batch;
     AnimatedSprite sprite;
-    Animation<TextureRegion> animationRegion;
+    Animation<TextureRegion> animationRegions;
     
-    public PauseScreen(Game game){
+    int onScreen = 0;
+    
+    public SplashScreen(Game game){
     	this.game = game;
     }
     
 	@Override
-	public void show() {		
+	public void show() {
+				
+		soundEfct = this.fileManager.getMusicFile("splash_screen"); //Gdx.audio.newMusic(Gdx.files.internal("sounds/start_sound.mp3"));
+		soundEfct.setVolume(soundEfct.getVolume()/2);
+		soundEfct.setLooping(false);
+		soundEfct.play();
+		
+//		song.setVolume(song.getVolume()/3);
+//		song.play();
+//		song.setLooping(true);
+		
 		camera = new OrthographicCamera(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
 		batch = new SpriteBatch();
 		
-		animationRegion = getAnimationRegions();
-		sprite = new AnimatedSprite(animationRegion);
+		animationRegions = getAnimationRegions();
+		sprite = new AnimatedSprite(animationRegions);
 	}
 
 	@Override
 	public void render(float delta) {
+		if((sprite.isAnimationFinished() && !this.soundEfct.isPlaying()) || (sprite.isAnimationFinished() && Gdx.input.isKeyJustPressed(Keys.ANY_KEY))){
+			this.soundEfct.pause();
+			this.game.moveToNextScreen(ScreenType.START);
+		}
 		camera.update();
 		batch.begin();
 		
@@ -56,22 +77,25 @@ public class PauseScreen implements CustomScreen{
 		
 		batch.end();
 		
-		if(Gdx.input.isKeyJustPressed(Keys.ANY_KEY)) {
-			this.game.moveToNextScreen(ScreenType.START); 
-		}
+//		song.setVolume(song.getVolume()/2);
+//		soundEfct.play();
 	}
 	
 	public Animation<TextureRegion> getAnimationRegions() {
 		Animation<TextureRegion> region;
-		Texture t = this.fileManager.getTextureFile("game_over");//new Texture("screens/game_over.png");
 		
-		//Death Animation
-		Array<TextureRegion> r = new Array<TextureRegion>(2);
-		r.setSize(2);
-		for(int i=0; i<2; i++) {
-			r.set(i, new TextureRegion(t, i*32, 0, 32, 32));
+		Texture t = this.fileManager.getTextureFile("intro_splash");//new Texture("screens/intro_scroll.png");
+
+		//Pressed Start Screen
+		Array<TextureRegion> r = new Array<TextureRegion>(25);
+		r.setSize(25);
+		t = this.fileManager.getTextureFile("intro_splash");//new Texture("screens/after_press_start.png");
+		for(int i=0; i<25; i++) {
+			r.set(i, new TextureRegion(t, i*96, 0, 96, 96));
 		}
-		region = new Animation<TextureRegion>(0.25f, r, PlayMode.LOOP);
+		 
+		region = new Animation<TextureRegion>(0.20f, r, PlayMode.NORMAL);
+		 
 		return region;
 	}
 
@@ -98,22 +122,25 @@ public class PauseScreen implements CustomScreen{
 	@Override
 	public void dispose() {
 		batch.dispose();
-//		music.dispose();
+//		song.dispose();
+//		soundEfct.dispose();
 		this.fileManager.clearAssets();
 	}
 
 	@Override
 	public void loadAssets(FileManager manager) {
 		String[] music = new String[]{
-			"death_music"
+			//"title_scroll_music", //wtf is this one??
+			"splash_screen"
 		};
 		
 		String[] textures = new String[]{
-			"game_over"
+			"intro_splash"
 		};
 		
 		this.fileManager = manager;
 		
 		this.fileManager.loadAssets(textures, music);
 	}
+
 }

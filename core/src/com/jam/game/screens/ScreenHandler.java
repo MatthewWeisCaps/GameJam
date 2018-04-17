@@ -20,12 +20,17 @@ public class ScreenHandler implements Disposable {
 	
 	private FileManager manager;
 	
+	public boolean isPaused;
+	
 	public ScreenHandler(Game game){
 		this.screens = new HashMap<ScreenType, CustomScreen>();
 		
 		this.g = game;
-		this.current = ScreenType.START;
+		this.current = ScreenType.SPLASH;
 		
+		this.isPaused = false;
+		
+		screens.put(ScreenType.SPLASH, new SplashScreen(this.g));
 		screens.put(ScreenType.START, new StartScreen(this.g));
 		screens.put(ScreenType.PAUSE, new PauseScreen(this.g));
 		screens.put(ScreenType.PLAY, new GameScreen(this.g));
@@ -44,6 +49,14 @@ public class ScreenHandler implements Disposable {
 		this.screens.get(this.current).resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 	
+	public void tryShowPauseScreen(float dt){
+		
+		if(this.isPaused){
+			GdxAI.setTimepiece(new DefaultTimepiece());
+			this.screens.get(ScreenType.PAUSE).render(dt);
+		}
+	}
+	
 	public void moveToScreenAndDispose(ScreenType newScreen){
 		this.screens.get(this.current).dispose();
 		
@@ -51,6 +64,7 @@ public class ScreenHandler implements Disposable {
 		this.screens.put(this.current, this.returnNewScreenType());
 		
 	}
+	
 	public void setCurrentScreen(ScreenType toSet){		
 		this.current = toSet;
 	}
@@ -59,9 +73,32 @@ public class ScreenHandler implements Disposable {
 		return this.screens.get(this.current);
 	}
 	
+	public void pauseCurrentScreen(){
+		if(this.current != ScreenType.PLAY)
+			return;
+		this.isPaused = !this.isPaused;
+		
+		if(this.isPaused){
+			this.screens.get(ScreenType.PAUSE).loadAssets(this.manager);
+			this.screens.get(ScreenType.PAUSE).show();
+			this.screens.get(ScreenType.PAUSE).resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+		}else{
+			this.screens.get(ScreenType.PAUSE).dispose();
+		}
+		
+		/*if(isPaused){
+			this.getCurrentScreen().pause();
+		}else{
+			this.getCurrentScreen().resume();
+		}*/
+	}
+	
 	private CustomScreen returnNewScreenType(){
 		switch(this.current){
 		
+		case SPLASH:
+			return new SplashScreen(g);
 		case START:
 			return new StartScreen(g);
 		case PLAY:
