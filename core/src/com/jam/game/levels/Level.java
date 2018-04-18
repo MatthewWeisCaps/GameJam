@@ -58,7 +58,7 @@ public class Level {
 		float yPos, xPos, width;
 		float height = 0.5f;
 		
-		yPos = 10.0f;
+		yPos = queue.size >= 1 ? 10.0f : 8.0f;
 		
 		int[] nextRowToSpawn;
 		

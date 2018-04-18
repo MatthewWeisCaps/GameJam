@@ -59,7 +59,7 @@ public class Powerup implements Component, Poolable {
 	}
 	
 	public void setLightSystem(){
-		this.light = new PointLight(LightingSystem.lightRayHandler, 40 /* num rays */, new Color(0.89f, 0.35f, 0.13f, 0.75f) /* color */,
+		this.light = new PointLight(LightingSystem.lightRayHandler, 200 /* num rays */, new Color(0.89f, 0.35f, 0.13f, 0.75f) /* color */,
 				5.0f /* distance */, 0 /* x */, 0 /* y */);
 		
 		this.light.attachToBody(this.getBody()); // attach to player
@@ -101,8 +101,8 @@ public class Powerup implements Component, Poolable {
 		AnimatedBox2DSprite spin = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 			
 		spin.setUseOrigin(false);
-		spin.setScale(2.5f);
-		spin.setPosition(0, 2f);
+		spin.setScale(2.5f); //was 2.5
+		spin.setPosition(0, 1.5f);
 	
 		return spin;
 	}
@@ -126,8 +126,8 @@ public class Powerup implements Component, Poolable {
 		AnimatedBox2DSprite spin = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 				
 		spin.setUseOrigin(false);
-		spin.setScale(2.5f);
-		spin.setPosition(0, 1.5f);
+		spin.setScale(2.5f); //was 2.5
+		spin.setPosition(0, 1.5f); //was 1.5
 		
 		return spin;
 	}

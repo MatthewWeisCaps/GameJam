@@ -54,9 +54,7 @@ public class PlayerSystem extends EntitySystem{
 	
 	public void tickLightPowerUp(){
 		if(this.pc.powerupTime <= 0){
-			this.pc.powerupTime = 0;
-			this.pc.lightPowerupEnabled = false;
-			
+			this.pc.disableLightPowerup();
 			return;
 		}
 		

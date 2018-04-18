@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.jam.game.components.PlayerComponent;
 import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Mappers;
+import com.jam.game.utils.enums.Category;
 
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
@@ -30,9 +31,9 @@ public class LightingSystem extends EntitySystem implements Disposable {
 		this.player =  player;
 		lightRayHandler = new RayHandler(world);
 		
-		light = new PointLight(lightRayHandler, 40 /* num rays */, new Color(1.0f, 1.0f, 1.0f, 0.8f) /* color */,
+		light = new PointLight(lightRayHandler, 500 /* num rays */, new Color(212.0f, 235.0f, 255.0f, 0.7f) /* color */,//new Color(1.0f, 1.0f, 1.0f, 0.7f)
 				Mappers.playerMap.get(this.player).getDist() /* distance */, 0 /* x */, 0 /* y */);
-		
+
 		light.attachToBody(Mappers.bodyMap.get(player).b2dBody); // attach to player
 		light.setXray(true);
 	}

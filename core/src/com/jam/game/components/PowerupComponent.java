@@ -21,9 +21,6 @@ public class PowerupComponent implements Component, Poolable{
 				System.out.println("UN-HANDLED POWERUP TYPE");
 				break;
 		}
-		if(this.powerup.getType() == PowerupType.LIGHT){
-			
-		}
 		
 	}
 	
