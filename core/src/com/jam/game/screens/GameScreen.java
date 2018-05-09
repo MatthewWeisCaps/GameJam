@@ -70,7 +70,7 @@ public class GameScreen implements CustomScreen {
 	private Game game;
 	private UI ui;
 		
-	public boolean playerDeath = false;
+	public static boolean playerDeath = false;
 	
 	public final static Texture TEXTURE = new Texture("Character_Walk_Cycle.png"); //TODO: Replace with respective stuff (Character sheet)
 	
@@ -143,7 +143,7 @@ public class GameScreen implements CustomScreen {
 			engine.getSystem(RenderingSystem.class).update(delta);
 			engine.getSystem(LightingSystem.class).update(delta);
 		}
-//		b2dRenderer.render(world, camera.combined);
+//		b2dRenderer.render(world, camera.combined); //TODO
 		
 		this.ui.draw();
 	}
@@ -258,27 +258,27 @@ public class GameScreen implements CustomScreen {
 		float aniSpeed = 0.2f;
 		
 		//Walk Right
-		Array<TextureRegion> regions = new Array<TextureRegion>(3);
-		regions.setSize(3);
+		Array<TextureRegion> regions = new Array<TextureRegion>(4);
+		regions.setSize(4);
 		
 		regions.set(0, getRegion(TEXTURE, 0, 0, false, false));
 		regions.set(1, getRegion(TEXTURE, 1, 0, false, false));
 		regions.set(2, getRegion(TEXTURE, 2, 0, false, false));
-		regions.set(1, getRegion(TEXTURE, 3, 0, false, false));
+		regions.set(3, getRegion(TEXTURE, 3, 0, false, false));
 		
-		AnimatedBox2DSprite rightWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		AnimatedBox2DSprite rightWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 		anim.animations.put(PlayerAnims.WALK_RIGHT, rightWalk);
 		
 		//Walk Left
-		regions = new Array<TextureRegion>(3);
-		regions.setSize(3);
+		regions = new Array<TextureRegion>(4);
+		regions.setSize(4);
 		
 		regions.set(0, getRegion(TEXTURE, 0, 0, true, false));
 		regions.set(1, getRegion(TEXTURE, 1, 0, true, false));
 		regions.set(2, getRegion(TEXTURE, 2, 0, true, false));
-		regions.set(1, getRegion(TEXTURE, 3, 0, true, false));
+		regions.set(3, getRegion(TEXTURE, 3, 0, true, false));
 		
-		AnimatedBox2DSprite leftWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP_PINGPONG)));
+		AnimatedBox2DSprite leftWalk = new AnimatedBox2DSprite(new AnimatedSprite(new Animation<TextureRegion>(aniSpeed, regions, PlayMode.LOOP)));
 		anim.animations.put(PlayerAnims.WALK_LEFT, leftWalk);
 		
 		//Idle Right
@@ -328,16 +328,15 @@ public class GameScreen implements CustomScreen {
 		for (Entry<String, AnimatedBox2DSprite> se : anim.animations.entries()) {
 			AnimatedBox2DSprite s = se.value;
 			s.setUseOrigin(false);
-			s.setScale(1.65f, 1.20f);
-//			s.setScale(1.25f, 0.8f);
-//			s.setScale(1.5f);
-			s.setPosition(0, 0.25f);
+//			s.setScale(1.65f, 1.20f);
+			s.setScale(1.5f);
+			s.setPosition(0, 0.5f);
 		}
 	}
 	
 	
 	TextureRegion getRegion(Texture tex, int x, int y, boolean flipX, boolean isJump) {
-		int width = isJump ? 20 : 16;
+		int height = isJump ? 27 : 32;
 		if (flipX) {
 			return new TextureRegion(tex, (x+1)*32 - 14, y*32 + 4, -18, 27);
 		}
@@ -346,7 +345,8 @@ public class GameScreen implements CustomScreen {
 	}
 	
 	void createFloor() { //https://www.gamedevelopment.blog/full-libgdx-game-tutorial-entities-ashley/
-		TextureRegion FLOOR_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 0, 6*32, 32, 7);
+		Texture floor =  new Texture("platform/platforms_ALL.png");
+		TextureRegion FLOOR_TEXTURE = new TextureRegion(floor, 0, 0, 32, 7);
 		//TextureRegion WALL_TEXTURE = new TextureRegion(GameScreen.TEXTURE, 4*32, 6*32, 32, 7);
 		
 		Entity entity = engine.createEntity();

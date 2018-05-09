@@ -3,6 +3,7 @@ package com.jam.game.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.jam.game.powerup.Powerup;
+import com.jam.game.systems.LevelSystem;
 import com.jam.game.utils.enums.PowerupType;
 
 public class PowerupComponent implements Component, Poolable{
@@ -15,7 +16,7 @@ public class PowerupComponent implements Component, Poolable{
 				player.enableLightPowerup();
 				break;
 			case HELMET:
-				System.out.println("HELMET!");
+				LevelSystem.score += 10;
 				break;
 			default:
 				System.out.println("UN-HANDLED POWERUP TYPE");

@@ -61,8 +61,8 @@ public class ScreenHandler implements Disposable {
 		this.screens.get(this.current).dispose();
 		
 		this.current = newScreen;
-		this.screens.put(this.current, this.returnNewScreenType());
 		
+		this.screens.put(this.current, this.returnNewScreenType());
 	}
 	
 	public void setCurrentScreen(ScreenType toSet){		

@@ -24,7 +24,7 @@ public class UI {
 	public void draw(){
 		this.batch.begin();
 //		this.batch.draw(this.numbers, 0, GameScreen.VIRTUAL_HEIGHT * 10 - (GameScreen.VIRTUAL_HEIGHT/3));
-		font.draw(this.batch, "Score: " + Integer.toString(((int) this.level.getYHeight())), 0, GameScreen.VIRTUAL_HEIGHT * 10 - (GameScreen.VIRTUAL_HEIGHT/3));
+		font.draw(this.batch, "Score: " + Integer.toString(this.level.getScore()), 0, GameScreen.VIRTUAL_HEIGHT * 10 - (GameScreen.VIRTUAL_HEIGHT/3));
 		this.batch.end();
 	}
 }

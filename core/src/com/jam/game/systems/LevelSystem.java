@@ -21,6 +21,7 @@ import com.jam.game.components.PowerupComponent;
 import com.jam.game.components.TransformComponent;
 import com.jam.game.levels.Level;
 import com.jam.game.powerup.Powerup;
+import com.jam.game.screens.GameScreen;
 import com.jam.game.utils.Mappers;
 import com.jam.game.utils.Rando;
 import com.jam.game.utils.enums.PlatformType;
@@ -40,6 +41,9 @@ public class LevelSystem extends EntitySystem {
 	private Entity[] walls;
 	
 	private OrthographicCamera cam;
+	
+	public static int score = 0;
+	
 	private float yHeight = 0.0f;
 	
 	private final float ITEM_CHANCE = 0.40f; //must be larger than
@@ -255,8 +259,14 @@ public class LevelSystem extends EntitySystem {
 		return yHeight;
 	}
 	
+	public int getScore(){
+		return (int) yHeight + this.score;
+	}
+	
 	// test 1
 	private float calculateYHeight() {
+		if(GameScreen.playerDeath) return this.yHeight;
+		
 		camSpeed += camSpeedIncrease;
 		
 		if(camSpeed > camSpeedMax) camSpeed = camSpeedMax;

@@ -64,16 +64,18 @@ public class SplashScreen implements CustomScreen{
 
 	@Override
 	public void render(float delta) {
-		if((sprite.isAnimationFinished() && !this.soundEfct.isPlaying()) || (sprite.isAnimationFinished() && Gdx.input.isKeyJustPressed(Keys.ANY_KEY))){
-			this.soundEfct.pause();
-			this.game.moveToNextScreen(ScreenType.START);
-		}
 		camera.update();
 		batch.begin();
+		
 		
 		batch.setProjectionMatrix(camera.combined);
 		sprite.update(delta);
 		sprite.draw(batch);
+		
+		if((sprite.isAnimationFinished() && !this.soundEfct.isPlaying()) || (sprite.isAnimationFinished() && Gdx.input.isKeyJustPressed(Keys.ANY_KEY))){
+			this.soundEfct.pause();
+			this.game.moveToNextScreen(ScreenType.START);
+		}
 		
 		batch.end();
 		
@@ -121,7 +123,7 @@ public class SplashScreen implements CustomScreen{
 
 	@Override
 	public void dispose() {
-		batch.dispose();
+//		batch.dispose();
 //		song.dispose();
 //		soundEfct.dispose();
 		this.fileManager.clearAssets();
